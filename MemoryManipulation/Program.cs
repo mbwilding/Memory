@@ -1,17 +1,15 @@
-﻿using System;
-
-namespace MemoryManipulation
+﻿namespace MemoryManipulation
 {
-    class Program
+    internal class Program
     {
-        static void Main()
+
+
+        private static void Main()
         {
-            MemoryManage memory = new();
+            Interface.Setup();
 
-            while (true)
-            {
-
-            }
+            // Start your thread here
+            AoE2DE_s.Start();
         }
     }
 }

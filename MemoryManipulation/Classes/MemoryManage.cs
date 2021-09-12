@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
+// ReSharper disable PossibleNullReferenceException
 // ReSharper disable InconsistentNaming
 // ReSharper disable NotAccessedVariable
 
@@ -22,36 +24,49 @@ namespace MemoryManipulation
         static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, int dwSize, out IntPtr lpNumberOfBytesWritten);
         #endregion
 
-        //private const int PROCESS_VM_READ = 0x0010;
-        //private const int PROCESS_VM_WRITE = 0x0020;
-        private const int PROCESS_ALL_ACCESS = 0x1F0FFF;
-
-        //private const string _processName = "AoE2DE_s";
-        private const string _processName = "BinaryDifference";
-        private readonly IntPtr _processHandle;
-        private readonly IntPtr _baseAddress;
-
-        private readonly List<long> MapVisibilityOffsets = new() { 0x03165DE8, 0x258, 0x10, 0x100, 0x3C };
-        public long MapVisibility;
-        private readonly List<long> ToolTipSizeOffsets = new() { 0x034FFB70, 0x90, 0xC48, 0x240 };
-        public long ToolTipSize;
-
-        private readonly List<long> BDOffset = new() { 0x0001F488, 0x40, 0x30, 0x10, 0x50, 0xA0, 0x0, 0x5E };
-        public long BD;
-            
-
-        public MemoryManage()
+        #region Enums
+        public enum AccessMode
         {
-            var process = Process.GetProcessesByName(_processName)[0];
-            _processHandle = OpenProcess(PROCESS_ALL_ACCESS, false, process.Id);
-            if (process.MainModule != null) _baseAddress = process.MainModule.BaseAddress;
+            PROCESS_VM_READ = 0x0010,
+            PROCESS_VM_WRITE = 0x0020,
+            PROCESS_ALL_ACCESS = 0x1F0FFF
+        }
+        #endregion
 
-            //MapVisibility = TraverseMemOffsets(MapVisibilityOffsets);
-            //ToolTipSize = TraverseMemOffsets(ToolTipSizeOffsets);
-            BD = TraverseMemOffsets(BDOffset);
+        private static IntPtr _processHandle;
+        private static IntPtr _baseAddress;
+
+        public MemoryManage(string processName, AccessMode accessMode)
+        {
+            bool message = false;
+            Process process = null;
+            while (process == null)
+            {
+                try { process = Process.GetProcessesByName(processName)[0]; }
+                catch
+                {
+                    if (!message) Interface.Write("Please start the process.", ConsoleColor.Yellow);
+                    message = true;
+                }
+            }
+
+            try { _processHandle = OpenProcess((int)accessMode, false, process.Id); }
+            catch { Interface.Failed("Program couldn't be hooked."); }
+            try { _baseAddress = process.MainModule.BaseAddress; }
+            catch { Interface.Failed("Program has access protection."); }
+
+            Interface.Reset();
+            Interface.Write("Successfully hooked to process.", ConsoleColor.Blue);
+            Interface.Write(
+                            "\nProcess:      " + process.MainModule.ModuleName
+                            + "\nPath:         " + Path.GetDirectoryName(process.MainModule.FileName)
+                            + "\nBase Address: " + _baseAddress.ToString("X")
+                            + "\nEntry Point:  " + process.MainModule.EntryPointAddress.ToString("X")
+                              , ConsoleColor.Green
+            );
         }
 
-        private long TraverseMemOffsets(List<long> offsets)
+        public long TraverseMemOffsets(List<long> offsets)
         {
             long valueCurrent = _baseAddress.ToInt64();
             long valuePrevious = valueCurrent;
@@ -112,14 +127,11 @@ namespace MemoryManipulation
             IntPtr bytesRead = IntPtr.Zero;
             var myString = string.Empty;
 
-            for (int i = 1; i < 50; i++)
+            for (ulong i = 1; i < ulong.MaxValue; i++)
             {
                 var buffer = new byte[i];
                 ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesRead);
-                if (buffer[(i - 1)] == 0)
-                {
-                    return myString;
-                }
+                if (buffer[(i - 1)] == 0) return myString;
                 myString = Encoding.UTF8.GetString(buffer);
             }
             return myString;
