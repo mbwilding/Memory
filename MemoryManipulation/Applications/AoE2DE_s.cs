@@ -27,8 +27,8 @@ namespace MemoryManipulation
             while (true)
             {
                 // Do something with the returned data
-                var test = memory.ReadInt(skirmishMapVisibilityOffsets);
-                Console.Title = test switch
+                var skirmishMapVisibility = memory.ReadInt(skirmishMapVisibilityOffsets);
+                Console.Title = skirmishMapVisibility switch
                 {
                     0 => Interface.AppName + " | Map Visibility: Normal",
                     1 => Interface.AppName + " | Map Visibility: Explored",
