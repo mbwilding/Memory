@@ -18,10 +18,10 @@ namespace MemoryManipulation
         private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
 
         [DllImport("kernel32.dll")]
-        static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, out IntPtr lpNumberOfBytesRead);
+        static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, out uint lpNumberOfBytesRead);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, int dwSize, out IntPtr lpNumberOfBytesWritten);
+        static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, int dwSize, out uint lpNumberOfBytesWritten);
         #endregion
 
         #region Enums
@@ -58,11 +58,11 @@ namespace MemoryManipulation
             Interface.Reset();
             Interface.Write("Successfully hooked to process.", ConsoleColor.Blue);
             Interface.Write(
-                            "\nProcess:      " + process.MainModule.ModuleName
+                              "\nProcess:      " + process.MainModule.ModuleName
                             + "\nPath:         " + Path.GetDirectoryName(process.MainModule.FileName)
                             + "\nBase Address: " + _baseAddress.ToString("X")
                             + "\nEntry Point:  " + process.MainModule.EntryPointAddress.ToString("X")
-                              , ConsoleColor.Green
+                              ,ConsoleColor.Green
             );
         }
 
@@ -71,7 +71,7 @@ namespace MemoryManipulation
             long valueCurrent = _baseAddress.ToInt64();
             long valuePrevious = valueCurrent;
 
-            IntPtr bytesRead;
+            uint bytesRead;
             byte[] buffer = new byte[sizeof(ulong)];
 
             foreach (var offset in offsets)
@@ -86,18 +86,18 @@ namespace MemoryManipulation
 
         public long ReadInt(long address)
         {
-            IntPtr bytesRead;
+            uint bytesRead;
             byte[] buffer = new byte[sizeof(int)];
 
             ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesRead);
-            var value = BitConverter.ToInt32(buffer, 0);
+            int value = BitConverter.ToInt32(buffer, 0);
 
             return value;
         }
 
         public bool WriteInt(long address, int value)
         {
-            IntPtr bytesWritten;
+            uint bytesWritten;
             byte[] buffer = BitConverter.GetBytes(value);
 
             return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesWritten);
@@ -105,18 +105,18 @@ namespace MemoryManipulation
 
         public float ReadFloat(long address)
         {
-            IntPtr bytesRead;
+            uint bytesRead;
             byte[] buffer = new byte[sizeof(float)];
 
             ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesRead);
-            var value = BitConverter.ToSingle(buffer, 0);
+            float value = BitConverter.ToSingle(buffer, 0);
 
             return value;
         }
 
         public bool WriteFloat(long address, float value)
         {
-            IntPtr bytesWritten;
+            uint bytesWritten;
             byte[] buffer = BitConverter.GetBytes(value);
 
             return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesWritten);
@@ -124,12 +124,12 @@ namespace MemoryManipulation
 
         public string ReadString(long address)
         {
-            IntPtr bytesRead = IntPtr.Zero;
-            var myString = string.Empty;
+            uint bytesRead;
+            string myString = string.Empty;
 
             for (ulong i = 1; i < ulong.MaxValue; i++)
             {
-                var buffer = new byte[i];
+                byte[] buffer = new byte[i];
                 ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesRead);
                 if (buffer[(i - 1)] == 0) return myString;
                 myString = Encoding.UTF8.GetString(buffer);
@@ -139,7 +139,7 @@ namespace MemoryManipulation
 
         public bool WriteString(long address, string value)
         {
-            IntPtr bytesWritten;
+            uint bytesWritten;
             byte[] newString = Encoding.UTF8.GetBytes(value);
             byte[] buffer = new byte[ReadString(address).Length];
 
