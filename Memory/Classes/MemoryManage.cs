@@ -5,6 +5,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using System.Windows;
+using System.Windows.Threading;
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable UnusedMember.Global
@@ -12,11 +14,10 @@ using System.Threading;
 // ReSharper disable InconsistentNaming
 // ReSharper disable NotAccessedVariable
 
-#pragma warning disable CA1822 // Mark members as static
-
-namespace MemoryManipulation
+// ReSharper disable once CheckNamespace
+namespace Memory
 {
-    internal class MemoryManage
+    public class MemoryManage
     {
         #region Native Imports
         [DllImport("kernel32.dll")]
@@ -38,39 +39,61 @@ namespace MemoryManipulation
         }
         #endregion
 
-        private static IntPtr _processHandle;
-        private static IntPtr _baseAddress;
+        private readonly IntPtr _processHandle;
+        private readonly IntPtr _baseAddress;
 
-        public MemoryManage(string processName, AccessMode accessMode)
+        public MemoryManage(MainWindow mainWindow, string procExe, AccessMode accessMode)
         {
             bool message = false;
             Process process = null;
             while (process == null)
             {
-                try { process = Process.GetProcessesByName(processName)[0]; }
+                try { process = Process.GetProcessesByName(procExe)[0]; }
                 catch
                 {
                     if (!message)
                     {
-                        Interface.Write("Please start the process.", ConsoleColor.Yellow);
+                        Application.Current.Dispatcher.BeginInvoke(
+                            DispatcherPriority.Background,
+                            new Action(() => mainWindow.StatusText("Please start the process.")));
                         message = true;
                     }
                     Thread.Sleep(500);
                 }
             }
-            try { _processHandle = OpenProcess((int)accessMode, false, process.Id); }
-            catch { Interface.Failed("Program couldn't be hooked."); }
-            try { _baseAddress = process.MainModule.BaseAddress; }
-            catch { Interface.Failed("Program has access protection."); }
-            Interface.Reset();
-            Interface.Write("Successfully hooked to process.", ConsoleColor.Blue);
-            Interface.Write(
-                              "\nProcess:      " + process.MainModule.ModuleName
-                            + "\nPath:         " + Path.GetDirectoryName(process.MainModule.FileName)
-                            + "\nBase Address: " + _baseAddress.ToString("X")
-                            + "\nEntry Point:  " + process.MainModule.EntryPointAddress.ToString("X")
-                              ,ConsoleColor.Green
-            );
+
+            try
+            {
+                _processHandle = OpenProcess((int) accessMode, false, process.Id);
+            }
+            catch
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                    DispatcherPriority.Background,
+                    new Action(() => mainWindow.StatusText("Program couldn't be hooked.")));
+            }
+
+            try
+            {
+                _baseAddress = process.MainModule.BaseAddress;
+            }
+            catch
+            {
+                Application.Current.Dispatcher.BeginInvoke(
+                    DispatcherPriority.Background,
+                    new Action(() => mainWindow.StatusText("Program has access protection.")));
+            }
+            Application.Current.Dispatcher.BeginInvoke(
+                DispatcherPriority.Background,
+                new Action(() =>
+                {
+                    mainWindow.StatusText("Successfully hooked to process.");
+                    mainWindow.DetailsText(
+                            "Process:      " + process.MainModule.ModuleName
+                        + "\nBase Address: " + _baseAddress.ToString("X")
+                        + "\nEntry Point:  " + process.MainModule.EntryPointAddress.ToString("X")
+                        );
+                }));
         }
 
         private long TraverseOffsets(List<long> offsets)

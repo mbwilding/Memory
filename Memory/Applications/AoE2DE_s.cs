@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
+using Memory;
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable FunctionNeverReturns
@@ -9,17 +9,20 @@ using System.Threading;
 
 namespace MemoryManipulation
 {
-    internal static class AoE2DE_s
+    internal class AoE2DE_s
     {
-        public static void Start()
+        private static MainWindow _mainWindow;
+
+        public static void Start(MainWindow mainWindow)
         {
+            _mainWindow = mainWindow;
             Thread thread = new(Process);
             thread.Start();
         }
 
         private static void Process()
         {
-            MemoryManage memory = new("AoE2DE_s", MemoryManage.AccessMode.PROCESS_VM_READ);
+            MemoryManage memory = new(_mainWindow, "notepad", MemoryManage.AccessMode.PROCESS_VM_READ);
 
             // Set your offsets here
             List<long> skirmishMapVisibilityOffsets = new() { 0x03165DE8, 0x258, 0x10, 0x100, 0x3C };
@@ -28,13 +31,7 @@ namespace MemoryManipulation
             {
                 // Do something with the returned data
                 var skirmishMapVisibility = memory.ReadInt(skirmishMapVisibilityOffsets);
-                Console.Title = skirmishMapVisibility switch
-                {
-                    0 => Interface.AppName + " | Map Visibility: Normal",
-                    1 => Interface.AppName + " | Map Visibility: Explored",
-                    2 => Interface.AppName + " | Map Visibility: All Visible",
-                    _ => Interface.AppName
-                };
+                //skirmishMapVisibility
             }
         }
     }
