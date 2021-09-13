@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace MemoryManipulation
 {
-    internal class AoE2DE_s
+    internal static class AoE2DE_s
     {
         public static void Start()
         {

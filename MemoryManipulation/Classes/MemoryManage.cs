@@ -4,10 +4,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
+// ReSharper disable SuggestVarOrType_BuiltInTypes
+// ReSharper disable UnusedMember.Global
 // ReSharper disable PossibleNullReferenceException
 // ReSharper disable InconsistentNaming
 // ReSharper disable NotAccessedVariable
+
+#pragma warning disable CA1822 // Mark members as static
 
 namespace MemoryManipulation
 {
@@ -45,8 +50,12 @@ namespace MemoryManipulation
                 try { process = Process.GetProcessesByName(processName)[0]; }
                 catch
                 {
-                    if (!message) Interface.Write("Please start the process.", ConsoleColor.Yellow);
-                    message = true;
+                    if (!message)
+                    {
+                        Interface.Write("Please start the process.", ConsoleColor.Yellow);
+                        message = true;
+                    }
+                    Thread.Sleep(500);
                 }
             }
             try { _processHandle = OpenProcess((int)accessMode, false, process.Id); }
@@ -64,7 +73,7 @@ namespace MemoryManipulation
             );
         }
 
-        public long TraverseOffsets(List<long> offsets)
+        private long TraverseOffsets(List<long> offsets)
         {
             long address = _baseAddress.ToInt64();
             byte[] buffer = new byte[sizeof(ulong)];

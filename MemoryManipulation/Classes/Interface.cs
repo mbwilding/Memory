@@ -4,7 +4,7 @@ namespace MemoryManipulation
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
 
-    public class Interface
+    public static class Interface
     {
         private const string Banner =
         @"
@@ -16,7 +16,7 @@ namespace MemoryManipulation
     ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   
         ";
 
-        public static string AppName = "Memory Manipulation";
+        public static readonly string AppName = "Memory Manipulation";
 
         public static void Setup()
         {
