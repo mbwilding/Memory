@@ -18,6 +18,12 @@ namespace Memory
         }
 
         #region UiControls
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                DragMove();
+        }
+
         public void StatusText(string text)
         {
             Status.Content = text;
@@ -41,11 +47,5 @@ namespace Memory
             }
         }
         #endregion
-
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left)
-                DragMove();
-        }
     }
 }
