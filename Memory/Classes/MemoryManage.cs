@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -13,8 +12,8 @@ using System.Windows.Threading;
 // ReSharper disable PossibleNullReferenceException
 // ReSharper disable InconsistentNaming
 // ReSharper disable NotAccessedVariable
-
 // ReSharper disable once CheckNamespace
+
 namespace Memory
 {
     public class MemoryManage
@@ -39,61 +38,113 @@ namespace Memory
         }
         #endregion
 
-        private readonly IntPtr _processHandle;
-        private readonly IntPtr _baseAddress;
+        private readonly MainWindow _mainWindow;
+        private readonly string _procExe;
+        private readonly AccessMode _accessMode;
+        private Process _process;
+        private IntPtr _processHandle;
+        private IntPtr _baseAddress;
+
+        public bool IsRunning {  get; private set; }
 
         public MemoryManage(MainWindow mainWindow, string procExe, AccessMode accessMode)
         {
-            bool message = false;
-            Process process = null;
-            while (process == null)
+            _procExe = procExe;
+            _mainWindow = mainWindow;
+            _accessMode = accessMode;
+
+            Thread process = new(FindProcess)
             {
-                try { process = Process.GetProcessesByName(procExe)[0]; }
+                Priority = ThreadPriority.Normal,
+            };
+            process.Start();
+        }
+
+        private void ProcessExit(object sender, EventArgs e)
+        {
+            IsRunning = false;
+            CheckProcess();
+        }
+
+        public void CheckProcess()
+        {
+            if (!IsRunning || _process == null)
+            {
+                FindProcess();
+            }
+        }
+
+        private void FindProcess()
+        {
+            do
+            {
+                try
+                {
+                    _process = Process.GetProcessesByName(_procExe)[0];
+                    if (_process.Responding)
+                    {
+                        IsRunning = true;
+                    }
+                }
                 catch
                 {
-                    if (!message)
-                    {
-                        Application.Current.Dispatcher.BeginInvoke(
-                            DispatcherPriority.Background,
-                            new Action(() => mainWindow.StatusText("Please start the process.")));
-                        message = true;
-                    }
-                    Thread.Sleep(500);
+                    Application.Current.Dispatcher.Invoke(
+                        DispatcherPriority.Background,
+                        new Action(() =>
+                        {
+                            _mainWindow.StatusText("Please start the process.");
+                            _mainWindow.DetailsText(string.Empty);
+                        }));
+                    IsRunning = false;
                 }
+                Thread.Sleep(500);
+            } while (!IsRunning);
+
+            try
+            {
+                _processHandle = OpenProcess((int)_accessMode, false, _process.Id);
+            }
+            catch
+            {
+                Application.Current.Dispatcher.Invoke(
+                    DispatcherPriority.Background,
+                    new Action(() => _mainWindow.StatusText("Program couldn't be hooked.")));
             }
 
             try
             {
-                _processHandle = OpenProcess((int) accessMode, false, process.Id);
+                _baseAddress = _process.MainModule.BaseAddress;
             }
             catch
             {
-                Application.Current.Dispatcher.BeginInvoke(
+                Application.Current.Dispatcher.Invoke(
                     DispatcherPriority.Background,
-                    new Action(() => mainWindow.StatusText("Program couldn't be hooked.")));
+                    new Action(() => _mainWindow.StatusText("Program has access protection.")));
             }
-
             try
             {
-                _baseAddress = process.MainModule.BaseAddress;
+                _process.EnableRaisingEvents = true;
+                _process.Exited += new EventHandler(ProcessExit);
             }
             catch
             {
-                Application.Current.Dispatcher.BeginInvoke(
+                Application.Current.Dispatcher.Invoke(
                     DispatcherPriority.Background,
-                    new Action(() => mainWindow.StatusText("Program has access protection.")));
+                    new Action(() => _mainWindow.StatusText("Error assigning exit handler.")));
             }
-            Application.Current.Dispatcher.BeginInvoke(
+
+            Application.Current.Dispatcher.Invoke(
                 DispatcherPriority.Background,
                 new Action(() =>
                 {
-                    mainWindow.StatusText("Running.");
-                    mainWindow.DetailsText(
-                            "Process:      " + process.MainModule.ModuleName
-                        + "\nBase Address: " + _baseAddress.ToString("X")
-                        + "\nEntry Point:  " + process.MainModule.EntryPointAddress.ToString("X")
+                    _mainWindow.StatusText("Running.");
+                    _mainWindow.DetailsText(
+                        "Process:      " + _process.MainModule.ModuleName
+                                         + "\nBase Address: " + _baseAddress.ToString("X")
+                                         + "\nEntry Point:  " + _process.MainModule.EntryPointAddress.ToString("X")
                     );
                 }));
+
         }
 
         private long TraverseOffsets(List<long> offsets)

@@ -27,7 +27,8 @@ namespace MemoryManipulation
         public AgeOfEmpires2DE(MainWindow mainWindow)
         {
             _mainWindow = mainWindow;
-            
+            _memory = new MemoryManage(_mainWindow, "AoE2DE_s", MemoryManage.AccessMode.PROCESS_ALL_ACCESS);
+
             Thread process = new(Process)
             {
                 Priority = ThreadPriority.AboveNormal
@@ -37,20 +38,28 @@ namespace MemoryManipulation
 
         private void Process()
         {
-            _memory = new MemoryManage(_mainWindow, "AoE2DE_s", MemoryManage.AccessMode.PROCESS_ALL_ACCESS);
-
             while (true)
             {
+                if (!_memory.IsRunning) continue;
+
                 // Read values
                 _skirmishMapVisibility = _memory.ReadInt(skirmishMapVisibilityOffsets);
 
                 // Act upon values
 
                 // UI
-                Application.Current.Dispatcher.BeginInvoke(
-                    DispatcherPriority.Background,
-                    new Action(() => _mainWindow.SkirmishMapVisibilitySelection(_skirmishMapVisibility)));
+                UiUpdate();
             }
+        }
+
+        private void UiUpdate()
+        {
+            Application.Current.Dispatcher.Invoke(
+                DispatcherPriority.Background,
+                new Action(() =>
+                {
+                    _mainWindow.SkirmishMapVisibilitySelection(_skirmishMapVisibility);
+                }));
         }
     }
 }
