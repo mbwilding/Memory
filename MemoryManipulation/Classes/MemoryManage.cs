@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -39,28 +38,17 @@ namespace MemoryManipulation
         }
         #endregion
 
-
-        private static string _processName;
-        private static AccessMode _accessMode;
-        private static Process _process;
         private static IntPtr _processHandle;
         private static IntPtr _baseAddress;
 
         public MemoryManage(string processName, AccessMode accessMode)
         {
-            _processName = processName;
-            _accessMode = accessMode;
-            CheckProcess();
-        }
-
-        private void CheckProcess()
-        {
-            if (_process is {Responding: true}) return;
             bool message = false;
-            while (_process == null)
+            Process process = null;
+            while (process == null)
             {
-                var x = Process.GetProcessesByName(_processName);
-                if (x != null)
+                try { process = Process.GetProcessesByName(processName)[0]; }
+                catch
                 {
                     if (!message)
                     {
@@ -70,20 +58,19 @@ namespace MemoryManipulation
                     Thread.Sleep(500);
                 }
             }
-            try { _processHandle = OpenProcess((int)_accessMode, false, _process.Id); }
+            try { _processHandle = OpenProcess((int)accessMode, false, process.Id); }
             catch { Interface.Failed("Program couldn't be hooked."); }
-            try { _baseAddress = _process.MainModule.BaseAddress; }
+            try { _baseAddress = process.MainModule.BaseAddress; }
             catch { Interface.Failed("Program has access protection."); }
             Interface.Reset();
             Interface.Write("Successfully hooked to process.", ConsoleColor.Blue);
             Interface.Write(
-                "\nProcess:      " + _process.MainModule.ModuleName
-                                   + "\nPath:         " + Path.GetDirectoryName(_process.MainModule.FileName)
-                                   + "\nBase Address: " + _baseAddress.ToString("X")
-                                   + "\nEntry Point:  " + _process.MainModule.EntryPointAddress.ToString("X")
-                , ConsoleColor.Green
+                              "\nProcess:      " + process.MainModule.ModuleName
+                            + "\nPath:         " + Path.GetDirectoryName(process.MainModule.FileName)
+                            + "\nBase Address: " + _baseAddress.ToString("X")
+                            + "\nEntry Point:  " + process.MainModule.EntryPointAddress.ToString("X")
+                              ,ConsoleColor.Green
             );
-            CheckProcess();
         }
 
         private long TraverseOffsets(List<long> offsets)
