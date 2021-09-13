@@ -14,7 +14,6 @@ namespace Memory
             InitializeComponent();
 
             // Instantiate your objects here
-
             _ageOfEmpires2De = new AgeOfEmpires2DE(this);
         }
 
