@@ -40,7 +40,7 @@ namespace MemoryManipulation
         {
             while (true)
             {
-                if (!_memory.IsRunning) continue;
+                if (!_memory.ProcessRunning) continue;
 
                 // Read values
                 _skirmishMapVisibility = _memory.ReadInt(skirmishMapVisibilityOffsets);
