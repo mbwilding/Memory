@@ -27,7 +27,7 @@ namespace MemoryManipulation
         public long _skirmishMapVisibility;
         private long _skirmishMapVisibilityPrev = -1;
 
-        // Set your offsets
+        // Set your offsets (Obtained via Cheat Engine, comparing pointer maps)
         public List<long> skirmishMapVisibilityOffsets = new() { 0x03165DE8, 0x258, 0x10, 0x100, 0x3C };
 
         public AgeOfEmpires2DE(MainWindow mainWindow)
@@ -35,7 +35,7 @@ namespace MemoryManipulation
             _mainWindow = mainWindow;
             _memory = new MemoryManage(_mainWindow, "AoE2DE_s", MemoryManage.AccessMode.PROCESS_ALL_ACCESS);
 
-            App.Current.MainWindow.Closed += MainWindowOnClosed;
+            if (Application.Current.MainWindow != null) Application.Current.MainWindow.Closed += MainWindowOnClosed;
 
             Thread processThread = new(Process) { Priority = ThreadPriority.Highest };
             processThread.Start();

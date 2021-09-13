@@ -2,6 +2,7 @@
 
 namespace Memory
 {
+    // ReSharper disable once RedundantExtendsListEntry
     public partial class App : Application
     {
 

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
 using MemoryManipulation;
 
 namespace Memory
 {
+    // ReSharper disable once RedundantExtendsListEntry
     public partial class MainWindow : Window
     {
         private readonly AgeOfEmpires2DE _ageOfEmpires2De;

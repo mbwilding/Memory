@@ -45,7 +45,7 @@ namespace Memory
         private IntPtr _processHandle;
         private IntPtr _baseAddress;
 
-        public bool ProcessRunning {  get; private set; }
+        public bool ProcessRunning { get; private set; }
 
         public MemoryManage(MainWindow mainWindow, string procExe, AccessMode accessMode)
         {
@@ -125,7 +125,7 @@ namespace Memory
             try
             {
                 _process.EnableRaisingEvents = true;
-                _process.Exited += new EventHandler(ProcessExit);
+                _process.Exited += ProcessExit;
             }
             catch
             {
