@@ -52,7 +52,6 @@ namespace Memory
                 _skirmishMapVisibility = _memory.ReadInt(skirmishMapVisibilityOffsets);
 
                 // TODO Act upon values here
-                Debug.WriteLine(_skirmishMapVisibility);
 
                 Thread.Sleep(_pollRateRead);
             }
