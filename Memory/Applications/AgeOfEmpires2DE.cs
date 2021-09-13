@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -22,8 +23,8 @@ namespace Memory
         private const int _pollRateUi = 100;
 
         // Declare your variables
-        public long _skirmishMapVisibility;
-        private long _skirmishMapVisibilityPrev = -1;
+        public int _skirmishMapVisibility;
+        private int _skirmishMapVisibilityPrev = -1;
 
         // Set your offsets (Obtained via Cheat Engine, comparing pointer maps)
         public List<long> skirmishMapVisibilityOffsets = new() { 0x03165DE8, 0x258, 0x10, 0x100, 0x3C };
@@ -51,6 +52,7 @@ namespace Memory
                 _skirmishMapVisibility = _memory.ReadInt(skirmishMapVisibilityOffsets);
 
                 // TODO Act upon values here
+                Debug.WriteLine(_skirmishMapVisibility);
 
                 Thread.Sleep(_pollRateRead);
             }
@@ -65,7 +67,7 @@ namespace Memory
                 if (_skirmishMapVisibility != _skirmishMapVisibilityPrev)
                 {
                     Application.Current.Dispatcher.Invoke(
-                        DispatcherPriority.Background,
+                        DispatcherPriority.DataBind,
                         new Action(() => _mainWindow.SkirmishMapVisibilitySelection(_skirmishMapVisibility)));
                 }
                 SetPrev();

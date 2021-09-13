@@ -89,7 +89,7 @@ namespace Memory
                 catch
                 {
                     Application.Current.Dispatcher.Invoke(
-                        DispatcherPriority.Background,
+                        DispatcherPriority.DataBind,
                         new Action(() =>
                         {
                             _mainWindow.StatusText("Please start the process.");
@@ -107,7 +107,7 @@ namespace Memory
             catch
             {
                 Application.Current.Dispatcher.Invoke(
-                    DispatcherPriority.Background,
+                    DispatcherPriority.DataBind,
                     new Action(() => _mainWindow.StatusText("Program couldn't be hooked.")));
             }
 
@@ -118,7 +118,7 @@ namespace Memory
             catch
             {
                 Application.Current.Dispatcher.Invoke(
-                    DispatcherPriority.Background,
+                    DispatcherPriority.DataBind,
                     new Action(() => _mainWindow.StatusText("Program has access protection.")));
             }
             try
@@ -129,12 +129,12 @@ namespace Memory
             catch
             {
                 Application.Current.Dispatcher.Invoke(
-                    DispatcherPriority.Background,
+                    DispatcherPriority.DataBind,
                     new Action(() => _mainWindow.StatusText("Error assigning exit handler.")));
             }
 
             Application.Current.Dispatcher.Invoke(
-                DispatcherPriority.Background,
+                DispatcherPriority.DataBind,
                 new Action(() =>
                 {
                     _mainWindow.StatusText("Running.");
@@ -162,7 +162,7 @@ namespace Memory
         }
 
         #region Public
-        public long ReadInt(List<long> offsets)
+        public int ReadInt(List<long> offsets)
         {
             byte[] buffer = new byte[sizeof(int)];
             long offset = TraverseOffsets(offsets);

@@ -34,9 +34,9 @@ namespace Memory
             Details.Text = text;
         }
 
-        public void SkirmishMapVisibilitySelection(long value)
+        public void SkirmishMapVisibilitySelection(int value)
         {
-            SkirmishMapVisibility.SelectedIndex = Convert.ToInt16(value);
+            SkirmishMapVisibility.SelectedIndex = value;
         }
 
         private void SkirmishMapVisibility_DropDownClosed(object sender, EventArgs e)
