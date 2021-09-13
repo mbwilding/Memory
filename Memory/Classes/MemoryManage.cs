@@ -139,7 +139,7 @@ namespace Memory
                 {
                     _mainWindow.StatusText("Running.");
                     _mainWindow.DetailsText(
-                        "Process:      " + _process.MainModule.ModuleName
+                                             "Process:      " + _process.MainModule.ModuleName
                                          + "\nBase Address: " + _baseAddress.ToString("X")
                                          + "\nEntry Point:  " + _process.MainModule.EntryPointAddress.ToString("X")
                     );
