@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Windows;
 using System.Windows.Threading;
+using static System.Windows.Application;
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable UnusedMember.Global
@@ -88,7 +88,7 @@ namespace Memory
                 }
                 catch
                 {
-                    Application.Current.Dispatcher.Invoke(
+                    Current.Dispatcher.Invoke(
                         DispatcherPriority.DataBind,
                         new Action(() =>
                         {
@@ -106,7 +106,7 @@ namespace Memory
             }
             catch
             {
-                Application.Current.Dispatcher.Invoke(
+                Current.Dispatcher.Invoke(
                     DispatcherPriority.DataBind,
                     new Action(() => _mainWindow.StatusText("Program couldn't be hooked.")));
             }
@@ -117,7 +117,7 @@ namespace Memory
             }
             catch
             {
-                Application.Current.Dispatcher.Invoke(
+                Current.Dispatcher.Invoke(
                     DispatcherPriority.DataBind,
                     new Action(() => _mainWindow.StatusText("Program has access protection.")));
             }
@@ -128,12 +128,12 @@ namespace Memory
             }
             catch
             {
-                Application.Current.Dispatcher.Invoke(
+                Current.Dispatcher.Invoke(
                     DispatcherPriority.DataBind,
                     new Action(() => _mainWindow.StatusText("Error assigning exit handler.")));
             }
 
-            Application.Current.Dispatcher.Invoke(
+            Current.Dispatcher.Invoke(
                 DispatcherPriority.DataBind,
                 new Action(() =>
                 {

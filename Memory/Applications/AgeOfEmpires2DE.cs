@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using System.Windows;
 using System.Windows.Threading;
+using static System.Windows.Application;
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable FunctionNeverReturns
@@ -34,7 +34,7 @@ namespace Memory
             _mainWindow = mainWindow;
             _memory = new MemoryManage(_mainWindow, "AoE2DE_s", MemoryManage.AccessMode.PROCESS_ALL_ACCESS);
 
-            if (Application.Current.MainWindow != null) Application.Current.MainWindow.Closed += MainWindowOnClosed;
+            if (Current.MainWindow != null) Current.MainWindow.Closed += MainWindowOnClosed;
 
             Thread processThread = new(Process) { Priority = ThreadPriority.Highest };
             processThread.Start();
@@ -64,7 +64,7 @@ namespace Memory
             {
                 if (!_memory.ProcessRunning)
                 {
-                    Application.Current.Dispatcher.Invoke(
+                    Current.Dispatcher.Invoke(
                         DispatcherPriority.DataBind,
                         new Action(() =>
                         {
@@ -74,7 +74,7 @@ namespace Memory
                     continue;
                 }
 
-                Application.Current.Dispatcher.Invoke(
+                Current.Dispatcher.Invoke(
                     DispatcherPriority.DataBind,
                     new Action(() =>
                     {
@@ -84,7 +84,7 @@ namespace Memory
                         }
                         if (_skirmishMapVisibility != _skirmishMapVisibilityPrev)
                         {
-                            Application.Current.Dispatcher.Invoke(
+                            Current.Dispatcher.Invoke(
                                 DispatcherPriority.DataBind,
                                 new Action(() => _mainWindow.SkirmishMapVisibility.SelectedIndex = _skirmishMapVisibility));
                         }
