@@ -45,7 +45,7 @@ namespace Memory
         private IntPtr _processHandle;
         private IntPtr _baseAddress;
 
-        public bool IsRunning {  get; private set; }
+        public bool ProcessRunning {  get; private set; }
 
         public MemoryManage(MainWindow mainWindow, string procExe, AccessMode accessMode)
         {
@@ -62,13 +62,13 @@ namespace Memory
 
         private void ProcessExit(object sender, EventArgs e)
         {
-            IsRunning = false;
+            ProcessRunning = false;
             CheckProcess();
         }
 
         public void CheckProcess()
         {
-            if (!IsRunning || _process == null)
+            if (!ProcessRunning || _process == null)
             {
                 FindProcess();
             }
@@ -83,7 +83,7 @@ namespace Memory
                     _process = Process.GetProcessesByName(_procExe)[0];
                     if (_process.Responding)
                     {
-                        IsRunning = true;
+                        ProcessRunning = true;
                     }
                 }
                 catch
@@ -95,10 +95,10 @@ namespace Memory
                             _mainWindow.StatusText("Please start the process.");
                             _mainWindow.DetailsText(string.Empty);
                         }));
-                    IsRunning = false;
+                    ProcessRunning = false;
                 }
                 Thread.Sleep(500);
-            } while (!IsRunning);
+            } while (!ProcessRunning);
 
             try
             {
