@@ -23,12 +23,11 @@ namespace MemoryManipulation
 
             // Set your offsets here
             List<long> skirmishMapVisibilityOffsets = new() { 0x03165DE8, 0x258, 0x10, 0x100, 0x3C };
-            long skirmishMapVisibility = memory.TraverseMemOffsets(skirmishMapVisibilityOffsets);
 
             while (true)
             {
                 // Do something with the returned data
-                var test = memory.ReadInt(skirmishMapVisibility);
+                var test = memory.ReadInt(skirmishMapVisibilityOffsets);
                 Console.Title = test switch
                 {
                     0 => Interface.AppName + " | Map Visibility: Normal",

@@ -64,69 +64,74 @@ namespace MemoryManipulation
             );
         }
 
-        public long TraverseMemOffsets(List<long> offsets)
+        public long TraverseOffsets(List<long> offsets)
         {
-            long valueCurrent = _baseAddress.ToInt64();
-            long valuePrevious = valueCurrent;
+            long address = _baseAddress.ToInt64();
             byte[] buffer = new byte[sizeof(ulong)];
-            foreach (var offset in offsets)
+            for (int i = 0; i < offsets.Count; i++)
             {
-                valueCurrent += offset;
-                valuePrevious = valueCurrent;
-                ReadProcessMemory(_processHandle, (IntPtr)valueCurrent, buffer, buffer.Length, out _);
-                valueCurrent = BitConverter.ToInt64(buffer, 0);
+                address += offsets[i];
+                if (i == offsets.Count - 1) break;
+                ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
+                address = BitConverter.ToInt64(buffer, 0);
             }
-            return valuePrevious;
+            return address;
         }
 
-        public long ReadInt(long address)
+        public long ReadInt(List<long> offsets)
         {
             byte[] buffer = new byte[sizeof(int)];
-            ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
+            long offset = TraverseOffsets(offsets);
+            ReadProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
             int value = BitConverter.ToInt32(buffer, 0);
             return value;
         }
 
-        public bool WriteInt(long address, int value)
+        public bool WriteInt(List<long> offsets, int value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
-            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
+            long offset = TraverseOffsets(offsets);
+            return WriteProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
         }
 
-        public float ReadFloat(long address)
+        public float ReadFloat(List<long> offsets)
         {
             byte[] buffer = new byte[sizeof(float)];
-            ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
+            long offset = TraverseOffsets(offsets);
+            ReadProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
             float value = BitConverter.ToSingle(buffer, 0);
             return value;
         }
 
-        public bool WriteFloat(long address, float value)
+        public bool WriteFloat(List<long> offsets, float value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
-            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
+            long offset = TraverseOffsets(offsets);
+            return WriteProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
         }
 
-        public string ReadString(long address)
+        public string ReadString(List<long> offsets)
         {
             string myString = string.Empty;
 
             for (ulong i = 1; i < ulong.MaxValue; i++)
             {
                 byte[] buffer = new byte[i];
-                ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
+                long offset = TraverseOffsets(offsets);
+                ReadProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
                 if (buffer[(i - 1)] == 0) return myString;
                 myString = Encoding.UTF8.GetString(buffer);
             }
             return myString;
         }
 
-        public bool WriteString(long address, string value)
+        public bool WriteString(List<long> offsets, string value)
         {
             byte[] newString = Encoding.UTF8.GetBytes(value);
-            byte[] buffer = new byte[ReadString(address).Length];
+            byte[] buffer = new byte[ReadString(offsets).Length];
             Array.Copy(newString, buffer, buffer.Length);
-            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
+            long offset = TraverseOffsets(offsets);
+            return WriteProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
         }
     }
 }
