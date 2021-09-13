@@ -73,7 +73,7 @@ namespace MemoryManipulation
             {
                 valueCurrent += offset;
                 valuePrevious = valueCurrent;
-                ReadProcessMemory(_processHandle, (IntPtr)valueCurrent, buffer, buffer.Length, out uint _);
+                ReadProcessMemory(_processHandle, (IntPtr)valueCurrent, buffer, buffer.Length, out _);
                 valueCurrent = BitConverter.ToInt64(buffer, 0);
             }
             return valuePrevious;
@@ -90,7 +90,7 @@ namespace MemoryManipulation
         public bool WriteInt(long address, int value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
-            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out uint _);
+            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
         }
 
         public float ReadFloat(long address)
@@ -104,7 +104,7 @@ namespace MemoryManipulation
         public bool WriteFloat(long address, float value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
-            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out uint _);
+            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
         }
 
         public string ReadString(long address)
@@ -126,7 +126,7 @@ namespace MemoryManipulation
             byte[] newString = Encoding.UTF8.GetBytes(value);
             byte[] buffer = new byte[ReadString(address).Length];
             Array.Copy(newString, buffer, buffer.Length);
-            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out uint _);
+            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
         }
     }
 }
