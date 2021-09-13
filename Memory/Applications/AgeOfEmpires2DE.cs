@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
-using Memory;
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable FunctionNeverReturns
 // ReSharper disable InconsistentNaming
 // ReSharper disable CheckNamespace
 
-namespace MemoryManipulation
+namespace Memory
 {
     internal class AgeOfEmpires2DE
     {
