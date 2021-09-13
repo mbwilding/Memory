@@ -49,12 +49,10 @@ namespace MemoryManipulation
                     message = true;
                 }
             }
-
             try { _processHandle = OpenProcess((int)accessMode, false, process.Id); }
             catch { Interface.Failed("Program couldn't be hooked."); }
             try { _baseAddress = process.MainModule.BaseAddress; }
             catch { Interface.Failed("Program has access protection."); }
-
             Interface.Reset();
             Interface.Write("Successfully hooked to process.", ConsoleColor.Blue);
             Interface.Write(
@@ -70,15 +68,12 @@ namespace MemoryManipulation
         {
             long valueCurrent = _baseAddress.ToInt64();
             long valuePrevious = valueCurrent;
-
-            uint bytesRead;
             byte[] buffer = new byte[sizeof(ulong)];
-
             foreach (var offset in offsets)
             {
                 valueCurrent += offset;
                 valuePrevious = valueCurrent;
-                ReadProcessMemory(_processHandle, (IntPtr)valueCurrent, buffer, buffer.Length, out bytesRead);
+                ReadProcessMemory(_processHandle, (IntPtr)valueCurrent, buffer, buffer.Length, out uint _);
                 valueCurrent = BitConverter.ToInt64(buffer, 0);
             }
             return valuePrevious;
@@ -86,51 +81,40 @@ namespace MemoryManipulation
 
         public long ReadInt(long address)
         {
-            uint bytesRead;
             byte[] buffer = new byte[sizeof(int)];
-
-            ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesRead);
+            ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
             int value = BitConverter.ToInt32(buffer, 0);
-
             return value;
         }
 
         public bool WriteInt(long address, int value)
         {
-            uint bytesWritten;
             byte[] buffer = BitConverter.GetBytes(value);
-
-            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesWritten);
+            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out uint _);
         }
 
         public float ReadFloat(long address)
         {
-            uint bytesRead;
             byte[] buffer = new byte[sizeof(float)];
-
-            ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesRead);
+            ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
             float value = BitConverter.ToSingle(buffer, 0);
-
             return value;
         }
 
         public bool WriteFloat(long address, float value)
         {
-            uint bytesWritten;
             byte[] buffer = BitConverter.GetBytes(value);
-
-            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesWritten);
+            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out uint _);
         }
 
         public string ReadString(long address)
         {
-            uint bytesRead;
             string myString = string.Empty;
 
             for (ulong i = 1; i < ulong.MaxValue; i++)
             {
                 byte[] buffer = new byte[i];
-                ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesRead);
+                ReadProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out _);
                 if (buffer[(i - 1)] == 0) return myString;
                 myString = Encoding.UTF8.GetString(buffer);
             }
@@ -139,13 +123,10 @@ namespace MemoryManipulation
 
         public bool WriteString(long address, string value)
         {
-            uint bytesWritten;
             byte[] newString = Encoding.UTF8.GetBytes(value);
             byte[] buffer = new byte[ReadString(address).Length];
-
             Array.Copy(newString, buffer, buffer.Length);
-
-            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out bytesWritten);
+            return WriteProcessMemory(_processHandle, (IntPtr)address, buffer, buffer.Length, out uint _);
         }
     }
 }

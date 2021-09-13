@@ -2,8 +2,6 @@
 {
     internal class Program
     {
-
-
         private static void Main()
         {
             Interface.Setup();
