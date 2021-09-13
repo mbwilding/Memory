@@ -34,16 +34,12 @@ namespace Memory
             Details.Text = text;
         }
 
-        public void SkirmishMapVisibilitySelection(int value)
-        {
-            SkirmishMapVisibility.SelectedIndex = value;
-        }
-
         private void SkirmishMapVisibility_DropDownClosed(object sender, EventArgs e)
         {
             if (_ageOfEmpires2De._skirmishMapVisibility != SkirmishMapVisibility.SelectedIndex)
             {
-                _ageOfEmpires2De._memory.WriteInt(_ageOfEmpires2De.skirmishMapVisibilityOffsets, SkirmishMapVisibility.SelectedIndex);
+                _ageOfEmpires2De._memory.WriteInt(_ageOfEmpires2De.skirmishMapVisibilityOffsets,
+                    SkirmishMapVisibility.SelectedIndex);
             }
         }
         #endregion
