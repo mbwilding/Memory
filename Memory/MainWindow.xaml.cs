@@ -1,11 +1,24 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using MemoryManipulation;
 
 namespace Memory
 {
     public partial class MainWindow : Window
     {
+        private readonly AgeOfEmpires2DE _ageOfEmpires2De;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            // Instantiate your objects here
+
+            _ageOfEmpires2De = new AgeOfEmpires2DE(this);
+        }
+
+        #region UiControls
         public void StatusText(string text)
         {
             Status.Content = text;
@@ -16,12 +29,18 @@ namespace Memory
             Details.Text = text;
         }
 
-        public MainWindow()
+        public void SkirmishMapVisibilitySelection(long value)
         {
-            InitializeComponent();
-
-            // Start your thread here
-            AoE2DE_s.Start(this);
+            SkirmishMapVisibility.SelectedIndex = Convert.ToInt16(value);
         }
+
+        private void SkirmishMapVisibility_DropDownClosed(object sender, EventArgs e)
+        {
+            if (_ageOfEmpires2De._skirmishMapVisibility != SkirmishMapVisibility.SelectedIndex)
+            {
+                _ageOfEmpires2De._memory.WriteInt(_ageOfEmpires2De.skirmishMapVisibilityOffsets, SkirmishMapVisibility.SelectedIndex);
+            }
+        }
+        #endregion
     }
 }

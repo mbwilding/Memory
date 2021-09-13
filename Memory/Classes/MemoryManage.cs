@@ -87,12 +87,12 @@ namespace Memory
                 DispatcherPriority.Background,
                 new Action(() =>
                 {
-                    mainWindow.StatusText("Successfully hooked to process.");
+                    mainWindow.StatusText("Running.");
                     mainWindow.DetailsText(
                             "Process:      " + process.MainModule.ModuleName
                         + "\nBase Address: " + _baseAddress.ToString("X")
                         + "\nEntry Point:  " + process.MainModule.EntryPointAddress.ToString("X")
-                        );
+                    );
                 }));
         }
 

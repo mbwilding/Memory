@@ -7,8 +7,13 @@
         mc:Ignorable="d"
         Title="Memory" SizeToContent="WidthAndHeight" ResizeMode="CanMinimize">
     <Grid>
-        <Label x:Name="Status" Content="" HorizontalAlignment="Center" Margin="0,196,0,0" VerticalAlignment="Top" Width="359" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFEFEFEF"/>
-        <TextBox x:Name="Details" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Height="196" Margin="159,0,0,0"/>
-
+        <Label x:Name="Status" Content="" HorizontalAlignment="Center" Margin="0,196,0,0" VerticalAlignment="Top" Width="359" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFEFEFEF" IsHitTestVisible="False"/>
+        <TextBox x:Name="Details" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" Height="196" Margin="159,0,0,0" IsTabStop="False" IsHitTestVisible="False"/>
+        <Label Content="Skirmish Map Visibility" HorizontalAlignment="Left" VerticalAlignment="Top" Width="159" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsHitTestVisible="False"/>
+        <ComboBox x:Name="SkirmishMapVisibility" HorizontalAlignment="Left" Margin="0,26,0,0" VerticalAlignment="Top" Width="159" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" DropDownClosed="SkirmishMapVisibility_DropDownClosed" IsTabStop="False">
+            <ComboBoxItem Content="Normal"/>
+            <ComboBoxItem Content="Explored"/>
+            <ComboBoxItem Content="All Visible"/>
+        </ComboBox>
     </Grid>
 </Window>
