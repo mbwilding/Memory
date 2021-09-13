@@ -16,12 +16,11 @@ namespace MemoryManipulation
     {
         public MemoryManage _memory;
         private readonly MainWindow _mainWindow;
+        private bool AppRunning = true;
 
         // Update rates
-        private readonly int _pollRateRead = 25;
-        private readonly int _pollRateUi = 100;
-
-        private bool AppRunning = true;
+        private const int _pollRateRead = 25;
+        private const int _pollRateUi = 100;
 
         // Declare your variables
         public long _skirmishMapVisibility;
