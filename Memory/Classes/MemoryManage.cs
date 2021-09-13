@@ -66,7 +66,7 @@ namespace Memory
             CheckProcess();
         }
 
-        public void CheckProcess()
+        private void CheckProcess()
         {
             if (!ProcessRunning || _process == null)
             {
@@ -161,6 +161,7 @@ namespace Memory
             return address;
         }
 
+        #region Public
         public long ReadInt(List<long> offsets)
         {
             byte[] buffer = new byte[sizeof(int)];
@@ -216,5 +217,6 @@ namespace Memory
             long offset = TraverseOffsets(offsets);
             return WriteProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
         }
+        #endregion
     }
 }
