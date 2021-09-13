@@ -94,7 +94,6 @@ namespace Memory
                         {
                             _mainWindow.StatusText("Please start the process.");
                             _mainWindow.DetailsText(string.Empty);
-
                         }));
                     ProcessRunning = false;
                 }
