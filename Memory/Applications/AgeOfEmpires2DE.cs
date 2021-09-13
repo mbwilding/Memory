@@ -18,6 +18,7 @@ namespace MemoryManipulation
 
         // Declare your variables
         public long _skirmishMapVisibility;
+        public long _skirmishMapVisibilityPrev = -1;
 
         public MemoryManage _memory;
 
@@ -29,11 +30,17 @@ namespace MemoryManipulation
             _mainWindow = mainWindow;
             _memory = new MemoryManage(_mainWindow, "AoE2DE_s", MemoryManage.AccessMode.PROCESS_ALL_ACCESS);
 
-            Thread process = new(Process)
+            Thread processThread = new(Process)
             {
-                Priority = ThreadPriority.AboveNormal
+                Priority = ThreadPriority.Highest
             };
-            process.Start();
+            processThread.Start();
+
+            Thread uiThread = new(UiUpdate)
+            {
+                Priority = ThreadPriority.AboveNormal,
+            };
+            uiThread.Start();
         }
 
         private void Process()
@@ -45,21 +52,30 @@ namespace MemoryManipulation
                 // Read values
                 _skirmishMapVisibility = _memory.ReadInt(skirmishMapVisibilityOffsets);
 
-                // Act upon values
-
-                // UI
-                UiUpdate();
+                // TODO Act upon values here
             }
         }
 
         private void UiUpdate()
         {
-            Application.Current.Dispatcher.Invoke(
-                DispatcherPriority.Background,
-                new Action(() =>
+            while (true)
+            {
+                if (!_memory.ProcessRunning) continue;
+
+                if (_skirmishMapVisibility != _skirmishMapVisibilityPrev)
                 {
-                    _mainWindow.SkirmishMapVisibilitySelection(_skirmishMapVisibility);
-                }));
+                    Application.Current.Dispatcher.Invoke(
+                        DispatcherPriority.Background,
+                        new Action(() => _mainWindow.SkirmishMapVisibilitySelection(_skirmishMapVisibility)));
+                }
+
+                SetPrev();
+            }
+        }
+
+        private void SetPrev()
+        {
+            _skirmishMapVisibilityPrev = _skirmishMapVisibility;
         }
     }
 }
