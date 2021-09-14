@@ -13,10 +13,10 @@ namespace Memory
         {
             InitializeComponent();
 
-#if DEBUG
-            Title = "Debug";
-#else
+#if !DEBUG
             Title = Randomizer.Run();
+#else
+            Title = "Debug";
 #endif
             // Instantiate your objects here
             _ageOfEmpires2De = new AgeOfEmpires2De(this);

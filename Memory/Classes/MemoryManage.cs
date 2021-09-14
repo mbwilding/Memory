@@ -66,15 +66,8 @@ namespace Memory
         private void ProcessExit(object sender, EventArgs e)
         {
             ProcessRunning = false;
-            CheckProcess();
-        }
-
-        private void CheckProcess()
-        {
-            if (!ProcessRunning || _proc == null)
-            {
-                FindProcess();
-            }
+            _ui.Details(string.Empty);
+            FindProcess();
         }
 
         private void FindProcess()
@@ -115,10 +108,11 @@ namespace Memory
             _proc.Exited += ProcessExit;
 
             _ui.Status("Running.");
-            _ui.Details(
-                "Process:      " + _proc.MainModule.ModuleName
-                                 + "\nBase Address: " + _baseAddress.ToString("X")
-                                 + "\nEntry Point:  " + _proc.MainModule.EntryPointAddress.ToString("X")
+            _ui.Details
+            (
+              "Process:      " + _proc.MainModule.ModuleName
+                 + "\nBase Address: " + _baseAddress.ToString("X")
+                 + "\nEntry Point:  " + _proc.MainModule.EntryPointAddress.ToString("X")
             );
         }
 

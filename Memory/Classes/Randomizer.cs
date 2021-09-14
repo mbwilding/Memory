@@ -5,6 +5,7 @@ using System.Linq;
 
 // REQUIRES PUBLISHING TO SINGLE FILE
 
+// ReSharper disable UnusedMember.Global
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable StringLiteralTypo
 // ReSharper disable once CheckNamespace
