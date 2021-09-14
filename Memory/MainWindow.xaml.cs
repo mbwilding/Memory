@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 
@@ -18,7 +19,6 @@ namespace Memory
 #else
             Title = Randomizer.Run();
 #endif
-
             // Instantiate your objects here
             _ageOfEmpires2De = new AgeOfEmpires2DE(this);
         }
