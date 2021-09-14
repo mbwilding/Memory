@@ -12,7 +12,6 @@ namespace Memory
         public MainWindow()
         {
             InitializeComponent();
-
 #if !DEBUG
             Title = Randomizer.Run();
 #else
