@@ -20,9 +20,12 @@ namespace Memory
         // Declare your variables
         public int SkirmishMapVisibility;
         private int _skirmishMapVisibilityPrev = -1;
+        public int SkirmishRelics;
+        private int _skirmishRelicsPrev = -1;
 
         // Set your offsets (Obtained via Cheat Engine, comparing pointer maps)
-        public List<long> SkirmishMapVisibilityOffsets = new() { 0x03165DE8, 0x258, 0x10, 0x100, 0x3C };
+        public List<long> SkirmishMapVisibilityOffsets = new() { 0x3165DE8, 0x258, 0x10, 0x100, 0x3C };
+        public List<long> SkirmishRelicsOffsets = new() { 0x34FF940, 0x8, 0x80C };
 
         public AgeOfEmpires2De(MainWindow mainWindow)
         {
@@ -43,6 +46,7 @@ namespace Memory
 
                 // Read values
                 SkirmishMapVisibility = Memory.ReadInt(SkirmishMapVisibilityOffsets);
+                SkirmishRelics = Memory.ReadInt(SkirmishRelicsOffsets);
 
                 // TODO Act upon values here
 
@@ -70,6 +74,8 @@ namespace Memory
                 // Updates UI only when change detected
                 if (SkirmishMapVisibility != _skirmishMapVisibilityPrev)
                     SkirmishMapVisibilityUpdate();
+                if (SkirmishRelics != _skirmishRelicsPrev)
+                    SkirmishRelicsUpdate();
 
                 SetPrev();
                 Thread.Sleep(PollRateUi);
@@ -80,6 +86,7 @@ namespace Memory
         private void SetPrev()
         {
             _skirmishMapVisibilityPrev = SkirmishMapVisibility;
+            _skirmishRelicsPrev = SkirmishRelics;
         }
 
         #region UiFunctions
@@ -126,6 +133,16 @@ namespace Memory
             {
                 Memory.WriteInt(SkirmishMapVisibilityOffsets, _mainWindow.SkirmishMapVisibility.SelectedIndex);
             }
+        }
+
+        public void SkirmishRelicsUpdate()
+        {
+            Current?.Dispatcher.Invoke(
+                DispatcherPriority.DataBind,
+                new Action(() =>
+                {
+                    _mainWindow.Relics.Content = SkirmishRelics;
+                }));
         }
         #endregion
     }
