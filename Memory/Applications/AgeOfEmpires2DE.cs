@@ -15,6 +15,7 @@ namespace Memory
         private readonly MainWindow _mainWindow;
 
         // Update rates
+        private const int PollRateIdle = 200;
         private const int PollRateRead = 25;
         private const int PollRateUi = 100;
         private const int PollRateFreeze = 50;
@@ -48,7 +49,11 @@ namespace Memory
         {
             while (Memory.AppRunning)
             {
-                if (!Memory.ProcessRunning) continue;
+                if (!Memory.ProcessRunning)
+                {
+                    Thread.Sleep(PollRateIdle);
+                    continue;
+                }
 
                 // Read values
                 if (!SkirmishMapVisibilityFreezed)
@@ -71,6 +76,7 @@ namespace Memory
                     // Disables UI Elements
                     if (SkirmishMapVisibilityCheck())
                         SkirmishMapVisibilityToggle(false);
+                    Thread.Sleep(PollRateIdle);
                     continue;
                 }
 
@@ -93,7 +99,11 @@ namespace Memory
         {
             while (Memory.AppRunning)
             {
-                if (!Memory.ProcessRunning) continue;
+                if (!Memory.ProcessRunning)
+                {
+                    Thread.Sleep(PollRateIdle);
+                    continue;
+                }
 
                 SkirmishMapVisibilityFreeze();
 
