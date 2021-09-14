@@ -157,7 +157,38 @@ namespace Memory
             return BitConverter.ToInt32(buffer, 0);
         }
 
+        public uint ReadUInt(List<long> offsets)
+        {
+            byte[] buffer = new byte[sizeof(uint)];
+            long offset = TraverseOffsets(offsets);
+            ReadProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+            return BitConverter.ToUInt32(buffer, 0);
+        }
+
+        public long ReadInt64(List<long> offsets)
+        {
+            byte[] buffer = new byte[sizeof(long)];
+            long offset = TraverseOffsets(offsets);
+            ReadProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+            return BitConverter.ToInt64(buffer, 0);
+        }
+
+        public ulong ReadUInt64(List<long> offsets)
+        {
+            byte[] buffer = new byte[sizeof(ulong)];
+            long offset = TraverseOffsets(offsets);
+            ReadProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+            return BitConverter.ToUInt64(buffer, 0);
+        }
+
         public bool WriteInt(List<long> offsets, int value)
+        {
+            byte[] buffer = BitConverter.GetBytes(value);
+            long offset = TraverseOffsets(offsets);
+            return WriteProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+        }
+
+        public bool WriteInt64(List<long> offsets, long value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
             long offset = TraverseOffsets(offsets);
