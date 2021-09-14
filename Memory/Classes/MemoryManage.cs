@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Windows.Threading;
 using static System.Windows.Application;
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
@@ -41,9 +40,9 @@ namespace Memory
         }
         #endregion
 
-        private readonly MainWindow _mainWindow;
         private readonly string _procExe;
         private readonly AccessMode _accessMode;
+        private readonly UiControls _ui;
         private Process _process;
         private IntPtr _processHandle;
         private IntPtr _baseAddress;
@@ -53,8 +52,8 @@ namespace Memory
         public MemoryManage(MainWindow mainWindow, string procExe, AccessMode accessMode)
         {
             _procExe = procExe;
-            _mainWindow = mainWindow;
             _accessMode = accessMode;
+            _ui = new UiControls(mainWindow, Current);
 
             Thread process = new(FindProcess)
             {
@@ -90,14 +89,7 @@ namespace Memory
                 if (processes.Length == 0)
                 {
                     ProcessRunning = false;
-                    Current.Dispatcher.Invoke(
-                        DispatcherPriority.DataBind,
-                        new Action(() =>
-                        {
-                            _mainWindow.StatusText("Please start the process.");
-                            _mainWindow.DetailsText(string.Empty);
-                        }));
-
+                    _ui.Status("Please start the process.");
                     Thread.Sleep(500);
                     continue;
                 }
@@ -108,9 +100,7 @@ namespace Memory
             _processHandle = OpenProcess((int)_accessMode, false, _process.Id);
             if (_processHandle == IntPtr.Zero)
             {
-                Current.Dispatcher.Invoke(
-                    DispatcherPriority.DataBind,
-                    new Action(() => _mainWindow.StatusText("Program couldn't be hooked.")));
+                _ui.Status("Program couldn't be hooked.");
             }
 
             if (_process.StartTime > DateTime.Now - TimeSpan.FromMilliseconds(1000))
@@ -121,25 +111,18 @@ namespace Memory
             _baseAddress = _process.MainModule.BaseAddress;
             if (_baseAddress == IntPtr.Zero)
             {
-                Current.Dispatcher.Invoke(
-                    DispatcherPriority.DataBind,
-                    new Action(() => _mainWindow.StatusText("Program has access protection.")));
+                _ui.Status("Program has access protection.");
             }
 
             _process.EnableRaisingEvents = true;
             _process.Exited += ProcessExit;
-            
-            Current.Dispatcher.Invoke(
-                DispatcherPriority.DataBind,
-                new Action(() =>
-                {
-                    _mainWindow.StatusText("Running.");
-                    _mainWindow.DetailsText(
-                                             "Process:      " + _process.MainModule.ModuleName
-                                         + "\nBase Address: " + _baseAddress.ToString("X")
-                                         + "\nEntry Point:  " + _process.MainModule.EntryPointAddress.ToString("X")
-                    );
-                }));
+
+            _ui.Status("Running.");
+            _ui.Details(
+                  "Process:      " + _process.MainModule.ModuleName
+                     + "\nBase Address: " + _baseAddress.ToString("X")
+                     + "\nEntry Point:  " + _process.MainModule.EntryPointAddress.ToString("X")
+                );
         }
 
         private long TraverseOffsets(List<long> offsets)

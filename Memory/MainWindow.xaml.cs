@@ -22,23 +22,15 @@ namespace Memory
             _ageOfEmpires2De = new AgeOfEmpires2DE(this);
         }
 
-#region UiControls
+        #region AppControls
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
         }
+        #endregion
 
-        public void StatusText(string text)
-        {
-            Status.Content = text;
-        }
-
-        public void DetailsText(string text)
-        {
-            Details.Text = text;
-        }
-
+        #region UiControls
         private void SkirmishMapVisibility_DropDownClosed(object sender, EventArgs e)
         {
             if (_ageOfEmpires2De._skirmishMapVisibility != SkirmishMapVisibility.SelectedIndex)
@@ -47,6 +39,6 @@ namespace Memory
                     SkirmishMapVisibility.SelectedIndex);
             }
         }
-#endregion
+        #endregion
     }
 }
