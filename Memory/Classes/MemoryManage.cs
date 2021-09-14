@@ -154,8 +154,7 @@ namespace Memory
             byte[] buffer = new byte[sizeof(int)];
             long offset = TraverseOffsets(offsets);
             ReadProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-            int value = BitConverter.ToInt32(buffer, 0);
-            return value;
+            return BitConverter.ToInt32(buffer, 0);
         }
 
         public bool WriteInt(List<long> offsets, int value)
@@ -170,11 +169,25 @@ namespace Memory
             byte[] buffer = new byte[sizeof(float)];
             long offset = TraverseOffsets(offsets);
             ReadProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-            float value = BitConverter.ToSingle(buffer, 0);
-            return value;
+            return BitConverter.ToSingle(buffer, 0);
         }
 
         public bool WriteFloat(List<long> offsets, float value)
+        {
+            byte[] buffer = BitConverter.GetBytes(value);
+            long offset = TraverseOffsets(offsets);
+            return WriteProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+        }
+
+        public double ReadDouble(List<long> offsets)
+        {
+            byte[] buffer = new byte[sizeof(double)];
+            long offset = TraverseOffsets(offsets);
+            ReadProcessMemory(_processHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+            return BitConverter.ToDouble(buffer, 0);
+        }
+
+        public bool WriteDouble(List<long> offsets, double value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
             long offset = TraverseOffsets(offsets);
