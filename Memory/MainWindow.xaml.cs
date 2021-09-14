@@ -36,5 +36,11 @@ namespace Memory
             _aoe2.SkirmishMapVisibility_DropDownClosed();
         }
         #endregion
+
+        private void SkirmishMapVisibilityFreeze_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            bool state = SkirmishMapVisibilityFreeze.IsChecked == true;
+            _aoe2.SkirmishMapVisibilityFreezed = state;
+        }
     }
 }

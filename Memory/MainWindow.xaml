@@ -13,7 +13,7 @@
         <Label x:Name="Status" Content="" HorizontalAlignment="Center" Margin="0,155,0,0" VerticalAlignment="Top" Width="197" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFEFEFEF" IsHitTestVisible="False"/>
         <TextBox x:Name="Details" HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Top" Width="197" Height="54" Margin="0,101,0,0" IsTabStop="False" IsHitTestVisible="False" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFF1F1F1" Visibility="Visible"/>
         <Label Content="Skirmish Map Visibility" HorizontalAlignment="Center" VerticalAlignment="Top" Width="197" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" IsHitTestVisible="False" Height="26"/>
-        <CheckBox x:Name="SkirmishMapVisibilityFreeze" HorizontalAlignment="Left" Margin="171,6,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="SkirmishMapVisibilityFreeze" HorizontalAlignment="Left" Margin="171,5,0,0" VerticalAlignment="Top" Checked="SkirmishMapVisibilityFreeze_CheckedChanged" Unchecked="SkirmishMapVisibilityFreeze_CheckedChanged"/>
         <ComboBox x:Name="SkirmishMapVisibility" HorizontalAlignment="Center" Margin="0,26,0,0" VerticalAlignment="Top" Width="197" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" DropDownClosed="SkirmishMapVisibility_DropDownClosed" IsTabStop="False">
             <ComboBoxItem Content="Normal"/>
             <ComboBoxItem Content="Explored"/>

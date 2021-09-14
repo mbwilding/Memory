@@ -4,6 +4,7 @@ using System.Threading;
 using System.Windows.Threading;
 using static System.Windows.Application;
 
+// ReSharper disable IdentifierTypo
 // ReSharper disable CheckNamespace
 
 namespace Memory
@@ -16,10 +17,13 @@ namespace Memory
         // Update rates
         private const int PollRateRead = 25;
         private const int PollRateUi = 100;
+        private const int PollRateFreeze = 50;
+
 
         // Declare your variables
         public int SkirmishMapVisibility;
         private int _skirmishMapVisibilityPrev = -1;
+        public bool SkirmishMapVisibilityFreezed;
         public int SkirmishRelics;
         private int _skirmishRelicsPrev = -1;
 
@@ -34,8 +38,10 @@ namespace Memory
 
             Thread threadProcess = new(Process) { Priority = ThreadPriority.Highest };
             threadProcess.Start();
-            Thread threadUi = new(Ui) { Priority = ThreadPriority.AboveNormal };
+            Thread threadUi = new(Ui) { Priority = ThreadPriority.Normal };
             threadUi.Start();
+            Thread threadFreeze = new(Freeze) { Priority = ThreadPriority.AboveNormal };
+            threadFreeze.Start();
         }
 
         private void Process()
@@ -45,7 +51,8 @@ namespace Memory
                 if (!Memory.ProcessRunning) continue;
 
                 // Read values
-                SkirmishMapVisibility = Memory.ReadInt(SkirmishMapVisibilityOffsets);
+                if (!SkirmishMapVisibilityFreezed)
+                    SkirmishMapVisibility = Memory.ReadInt(SkirmishMapVisibilityOffsets);
                 SkirmishRelics = Memory.ReadInt(SkirmishRelicsOffsets);
 
                 // TODO Act upon values here
@@ -79,6 +86,18 @@ namespace Memory
 
                 SetPrev();
                 Thread.Sleep(PollRateUi);
+            }
+        }
+
+        private void Freeze()
+        {
+            while (Memory.AppRunning)
+            {
+                if (!Memory.ProcessRunning) continue;
+
+                SkirmishMapVisibilityFreeze();
+
+                Thread.Sleep(PollRateFreeze);
             }
         }
 
@@ -133,6 +152,21 @@ namespace Memory
             {
                 Memory.WriteInt(SkirmishMapVisibilityOffsets, _mainWindow.SkirmishMapVisibility.SelectedIndex);
             }
+        }
+
+        public void SkirmishMapVisibilityFreeze()
+        {
+            int value = SkirmishMapVisibility;
+            bool state = false;
+            Current?.Dispatcher.Invoke(
+                DispatcherPriority.DataBind,
+                new Action(() =>
+                {
+                    if (_mainWindow.SkirmishMapVisibilityFreeze.IsChecked != true) return;
+                    value = _mainWindow.SkirmishMapVisibility.SelectedIndex;
+                    state = true;
+                }));
+            if (state) Memory.WriteInt(SkirmishMapVisibilityOffsets, value);
         }
 
         public void SkirmishRelicsUpdate()
