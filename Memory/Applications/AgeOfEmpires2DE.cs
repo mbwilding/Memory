@@ -118,6 +118,15 @@ namespace Memory
                     _mainWindow.SkirmishMapVisibility.SelectedIndex = SkirmishMapVisibility;
                 }));
         }
+
+        public void SkirmishMapVisibility_DropDownClosed()
+        {
+            // Called from UI
+            if (SkirmishMapVisibility != _mainWindow.SkirmishMapVisibility.SelectedIndex)
+            {
+                Memory.WriteInt(SkirmishMapVisibilityOffsets, _mainWindow.SkirmishMapVisibility.SelectedIndex);
+            }
+        }
         #endregion
     }
 }

@@ -174,18 +174,18 @@ namespace Memory
             return BitConverter.ToUInt64(buffer, 0);
         }
 
-        public bool WriteInt(List<long> offsets, int value)
+        public void WriteInt(List<long> offsets, int value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
             long offset = TraverseOffsets(offsets);
-            return WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+            WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
         }
 
-        public bool WriteInt64(List<long> offsets, long value)
+        public void WriteInt64(List<long> offsets, long value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
             long offset = TraverseOffsets(offsets);
-            return WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+            WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
         }
 
         public float ReadFloat(List<long> offsets)
@@ -196,11 +196,11 @@ namespace Memory
             return BitConverter.ToSingle(buffer, 0);
         }
 
-        public bool WriteFloat(List<long> offsets, float value)
+        public void WriteFloat(List<long> offsets, float value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
             long offset = TraverseOffsets(offsets);
-            return WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+            WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
         }
 
         public double ReadDouble(List<long> offsets)
@@ -211,11 +211,11 @@ namespace Memory
             return BitConverter.ToDouble(buffer, 0);
         }
 
-        public bool WriteDouble(List<long> offsets, double value)
+        public void WriteDouble(List<long> offsets, double value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
             long offset = TraverseOffsets(offsets);
-            return WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+            WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
         }
 
         public string ReadString(List<long> offsets)
@@ -233,13 +233,13 @@ namespace Memory
             return myString;
         }
 
-        public bool WriteString(List<long> offsets, string value)
+        public void WriteString(List<long> offsets, string value)
         {
             byte[] newString = Encoding.UTF8.GetBytes(value);
             byte[] buffer = new byte[ReadString(offsets).Length];
             Array.Copy(newString, buffer, buffer.Length);
             long offset = TraverseOffsets(offsets);
-            return WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+            WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
         }
         #endregion
     }

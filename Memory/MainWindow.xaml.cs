@@ -7,7 +7,7 @@ namespace Memory
     // ReSharper disable once RedundantExtendsListEntry
     public partial class MainWindow : Window
     {
-        private readonly AgeOfEmpires2De _ageOfEmpires2De;
+        private readonly AgeOfEmpires2De _aoe2;
 
         public MainWindow()
         {
@@ -19,7 +19,7 @@ namespace Memory
             Title = "Debug";
 #endif
             // Instantiate your objects here
-            _ageOfEmpires2De = new AgeOfEmpires2De(this);
+            _aoe2 = new AgeOfEmpires2De(this);
         }
 
         #region AppControls
@@ -33,11 +33,7 @@ namespace Memory
         #region UiControls
         private void SkirmishMapVisibility_DropDownClosed(object sender, EventArgs e)
         {
-            if (_ageOfEmpires2De.SkirmishMapVisibility != SkirmishMapVisibility.SelectedIndex)
-            {
-                _ageOfEmpires2De.Memory.WriteInt(_ageOfEmpires2De.SkirmishMapVisibilityOffsets,
-                    SkirmishMapVisibility.SelectedIndex);
-            }
+            _aoe2.SkirmishMapVisibility_DropDownClosed();
         }
         #endregion
     }
