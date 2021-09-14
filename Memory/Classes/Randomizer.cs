@@ -3,15 +3,16 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
+// REQUIRES PUBLISHING TO SINGLE FILE
+
 // ReSharper disable SuggestVarOrType_BuiltInTypes
 // ReSharper disable StringLiteralTypo
 // ReSharper disable once CheckNamespace
 
 namespace Memory
 {
-
-    // REQUIRES PUBLISHING TO SINGLE FILE
-
+    // ReSharper disable once UnusedMember.Global
+    // ReSharper disable once IdentifierTypo
     public static class Randomizer
     {
         public static readonly Random Rand = new();
