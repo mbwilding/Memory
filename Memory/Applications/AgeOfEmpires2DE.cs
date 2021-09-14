@@ -4,64 +4,61 @@ using System.Threading;
 using System.Windows.Threading;
 using static System.Windows.Application;
 
-// ReSharper disable SuggestVarOrType_BuiltInTypes
-// ReSharper disable FunctionNeverReturns
-// ReSharper disable InconsistentNaming
 // ReSharper disable CheckNamespace
 
 namespace Memory
 {
-    internal class AgeOfEmpires2DE
+    internal class AgeOfEmpires2De
     {
-        public MemoryManage _memory;
+        public MemoryManage Memory;
         private readonly MainWindow _mainWindow;
-        private bool AppRunning = true;
+        private bool _appRunning = true;
 
         // Update rates
-        private const int _pollRateRead = 25;
-        private const int _pollRateUi = 100;
+        private const int PollRateRead = 25;
+        private const int PollRateUi = 100;
 
         // Declare your variables
-        public int _skirmishMapVisibility;
+        public int SkirmishMapVisibility;
         private int _skirmishMapVisibilityPrev = -1;
 
         // Set your offsets (Obtained via Cheat Engine, comparing pointer maps)
-        public List<long> skirmishMapVisibilityOffsets = new() { 0x03165DE8, 0x258, 0x10, 0x100, 0x3C };
+        public List<long> SkirmishMapVisibilityOffsets = new() { 0x03165DE8, 0x258, 0x10, 0x100, 0x3C };
 
-        public AgeOfEmpires2DE(MainWindow mainWindow)
+        public AgeOfEmpires2De(MainWindow mainWindow)
         {
             _mainWindow = mainWindow;
-            _memory = new MemoryManage(_mainWindow, "AoE2DE_s", MemoryManage.AccessMode.PROCESS_ALL_ACCESS);
+            Memory = new MemoryManage(_mainWindow, "AoE2DE_s", MemoryManage.AccessMode.All);
 
             if (Current.MainWindow != null) Current.MainWindow.Closed += MainWindowOnClosed;
 
-            Thread processThread = new(Process) { Priority = ThreadPriority.Highest };
-            processThread.Start();
-            Thread uiThread = new(UiUpdate) { Priority = ThreadPriority.AboveNormal };
-            uiThread.Start();
+            Thread threadProcess = new(Process) { Priority = ThreadPriority.Highest };
+            threadProcess.Start();
+            Thread threadUi = new(Ui) { Priority = ThreadPriority.AboveNormal };
+            threadUi.Start();
         }
 
         private void Process()
         {
-            while (AppRunning)
+            while (_appRunning)
             {
-                if (!_memory.ProcessRunning) continue;
+                if (!Memory.ProcessRunning) continue;
 
                 // Read values
-                _skirmishMapVisibility = _memory.ReadInt(skirmishMapVisibilityOffsets);
+                SkirmishMapVisibility = Memory.ReadInt(SkirmishMapVisibilityOffsets);
 
                 // TODO Act upon values here
 
-                Thread.Sleep(_pollRateRead);
+                Thread.Sleep(PollRateRead);
             }
-            _memory.Clean();
+            Memory.Clean();
         }
 
-        private void UiUpdate()
+        private void Ui()
         {
-            while (AppRunning)
+            while (_appRunning)
             {
-                if (!_memory.ProcessRunning)
+                if (!Memory.ProcessRunning)
                 {
                     Current.Dispatcher.Invoke(
                         DispatcherPriority.DataBind,
@@ -81,15 +78,15 @@ namespace Memory
                         {
                             SkirmishMapVisibilityToggle(true);
                         }
-                        if (_skirmishMapVisibility != _skirmishMapVisibilityPrev)
+                        if (SkirmishMapVisibility != _skirmishMapVisibilityPrev)
                         {
                             Current.Dispatcher.Invoke(
                                 DispatcherPriority.DataBind,
-                                new Action(() => _mainWindow.SkirmishMapVisibility.SelectedIndex = _skirmishMapVisibility));
+                                new Action(() => _mainWindow.SkirmishMapVisibility.SelectedIndex = SkirmishMapVisibility));
                         }
                     }));
                 SetPrev();
-                Thread.Sleep(_pollRateUi);
+                Thread.Sleep(PollRateUi);
             }
         }
 
@@ -104,12 +101,12 @@ namespace Memory
 
         private void SetPrev()
         {
-            _skirmishMapVisibilityPrev = _skirmishMapVisibility;
+            _skirmishMapVisibilityPrev = SkirmishMapVisibility;
         }
 
         private void MainWindowOnClosed(object sender, EventArgs e)
         {
-            AppRunning = false;
+            _appRunning = false;
         }
     }
 }
