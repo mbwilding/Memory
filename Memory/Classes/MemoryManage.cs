@@ -19,13 +19,16 @@ namespace Memory
     public class MemoryManage
     {
         #region Native Imports
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
 
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool CloseHandle(IntPtr hHandle);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, [Out] byte[] lpBuffer, int dwSize, out uint lpNumberOfBytesRead);
 
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, int dwSize, out uint lpNumberOfBytesWritten);
         #endregion
 
@@ -58,6 +61,11 @@ namespace Memory
                 Priority = ThreadPriority.Normal,
             };
             process.Start();
+        }
+
+        public void Clean()
+        {
+            CloseHandle(_processHandle);
         }
 
         private void ProcessExit(object sender, EventArgs e)
@@ -148,7 +156,7 @@ namespace Memory
             return address;
         }
 
-        #region Public
+        #region MemFuncs
         public int ReadInt(List<long> offsets)
         {
             byte[] buffer = new byte[sizeof(int)];

@@ -54,6 +54,7 @@ namespace Memory
 
                 Thread.Sleep(_pollRateRead);
             }
+            _memory.Clean();
         }
 
         private void UiUpdate()
