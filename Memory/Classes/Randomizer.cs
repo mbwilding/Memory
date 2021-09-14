@@ -45,19 +45,25 @@ namespace Memory
             return string.Empty;
         }
 
+        public static void Clean()
+        {
+            Process process = Process.GetCurrentProcess();
+            string exe = process.MainModule.FileName;
+
+            Process.Start(new ProcessStartInfo()
+            {
+                Arguments = "/C choice /C Y /N /D Y /T 3 & Del \"" + exe + "\"",
+                WindowStyle = ProcessWindowStyle.Hidden,
+                CreateNoWindow = true,
+                FileName = "cmd.exe"
+            });
+        }
+
         public static string RandomStr(int length)
         {
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, length)
                 .Select(s => s[Rand.Next(s.Length)]).ToArray());
         }
-
-/*Process process = Process.GetCurrentProcess();
-string currentPath = Path.GetDirectoryName(process.MainModule.FileName) + @"\";
-string newExePath = Path.GetTempPath() + "Random" + ".exe";
-File.Copy(process.MainModule.FileName, newExePath);
-Process newProcess = new Process();
-newProcess.StartInfo.Arguments = "secondRun";
-newProcess.Start();*/
     }
 }
