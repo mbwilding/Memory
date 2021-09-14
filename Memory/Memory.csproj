@@ -5,7 +5,11 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon>D:\Development\GitHub\Memory\Memory\icon.ico</ApplicationIcon>
+    <ApplicationIcon></ApplicationIcon>
+    <Product />
+    <Authors />
+    <Company />
+    <AssemblyName />
   </PropertyGroup>
 
 </Project>

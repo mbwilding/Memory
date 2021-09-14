@@ -13,11 +13,17 @@ namespace Memory
         {
             InitializeComponent();
 
+#if DEBUG
+            Title = "Debug";
+#else
+            Title = Randomizer.Run();
+#endif
+
             // Instantiate your objects here
             _ageOfEmpires2De = new AgeOfEmpires2DE(this);
         }
 
-        #region UiControls
+#region UiControls
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
@@ -42,6 +48,6 @@ namespace Memory
                     SkirmishMapVisibility.SelectedIndex);
             }
         }
-        #endregion
+#endregion
     }
 }
