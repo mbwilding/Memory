@@ -78,16 +78,10 @@ namespace Memory
         {
             do
             {
-                try
+                Process[] processes = Process.GetProcessesByName(_procExe);
+                if (processes.Length == 0)
                 {
-                    _process = Process.GetProcessesByName(_procExe)[0];
-                    if (_process.Responding)
-                    {
-                        ProcessRunning = true;
-                    }
-                }
-                catch
-                {
+                    ProcessRunning = false;
                     Current.Dispatcher.Invoke(
                         DispatcherPriority.DataBind,
                         new Action(() =>
@@ -95,44 +89,38 @@ namespace Memory
                             _mainWindow.StatusText("Please start the process.");
                             _mainWindow.DetailsText(string.Empty);
                         }));
-                    ProcessRunning = false;
+
+                    Thread.Sleep(500);
+                    continue;
                 }
-                Thread.Sleep(500);
+                _process = processes[0];
+                ProcessRunning = true;
             } while (!ProcessRunning);
 
-            try
-            {
-                _processHandle = OpenProcess((int)_accessMode, false, _process.Id);
-            }
-            catch
+            _processHandle = OpenProcess((int)_accessMode, false, _process.Id);
+            if (_processHandle == IntPtr.Zero)
             {
                 Current.Dispatcher.Invoke(
                     DispatcherPriority.DataBind,
                     new Action(() => _mainWindow.StatusText("Program couldn't be hooked.")));
             }
 
-            try
+            if (_process.StartTime > DateTime.Now - TimeSpan.FromMilliseconds(1000))
             {
-                _baseAddress = _process.MainModule.BaseAddress;
+                Thread.Sleep(100);
             }
-            catch
+            
+            _baseAddress = _process.MainModule.BaseAddress;
+            if (_baseAddress == IntPtr.Zero)
             {
                 Current.Dispatcher.Invoke(
                     DispatcherPriority.DataBind,
                     new Action(() => _mainWindow.StatusText("Program has access protection.")));
             }
-            try
-            {
-                _process.EnableRaisingEvents = true;
-                _process.Exited += ProcessExit;
-            }
-            catch
-            {
-                Current.Dispatcher.Invoke(
-                    DispatcherPriority.DataBind,
-                    new Action(() => _mainWindow.StatusText("Error assigning exit handler.")));
-            }
 
+            _process.EnableRaisingEvents = true;
+            _process.Exited += ProcessExit;
+            
             Current.Dispatcher.Invoke(
                 DispatcherPriority.DataBind,
                 new Action(() =>
@@ -144,7 +132,6 @@ namespace Memory
                                          + "\nEntry Point:  " + _process.MainModule.EntryPointAddress.ToString("X")
                     );
                 }));
-
         }
 
         private long TraverseOffsets(List<long> offsets)
