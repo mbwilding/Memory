@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Windows.Threading;
 using static System.Windows.Application;
@@ -12,7 +13,6 @@ namespace Memory
     {
         public MemoryManage Memory;
         private readonly MainWindow _mainWindow;
-        private bool _appRunning = true;
 
         // Update rates
         private const int PollRateRead = 25;
@@ -30,8 +30,6 @@ namespace Memory
             _mainWindow = mainWindow;
             Memory = new MemoryManage(_mainWindow, "AoE2DE_s", MemoryManage.AccessMode.All);
 
-            if (Current.MainWindow != null) Current.MainWindow.Closed += MainWindowOnClosed;
-
             Thread threadProcess = new(Process) { Priority = ThreadPriority.Highest };
             threadProcess.Start();
             Thread threadUi = new(Ui) { Priority = ThreadPriority.AboveNormal };
@@ -40,7 +38,7 @@ namespace Memory
 
         private void Process()
         {
-            while (_appRunning)
+            while (Memory.AppRunning)
             {
                 if (!Memory.ProcessRunning) continue;
 
@@ -56,7 +54,7 @@ namespace Memory
 
         private void Ui()
         {
-            while (_appRunning)
+            while (Memory.AppRunning)
             {
                 if (!Memory.ProcessRunning)
                 {
@@ -83,12 +81,6 @@ namespace Memory
         private void SetPrev()
         {
             _skirmishMapVisibilityPrev = SkirmishMapVisibility;
-        }
-
-        // Finalizes threads when closed
-        private void MainWindowOnClosed(object sender, EventArgs e)
-        {
-            _appRunning = false;
         }
 
         #region UiFunctions

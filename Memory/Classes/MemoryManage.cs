@@ -42,6 +42,7 @@ namespace Memory
         private Process _proc;
         private IntPtr _procHandle;
         private IntPtr _baseAddress;
+        public bool AppRunning = true;
 
         public bool ProcessRunning { get; private set; }
 
@@ -51,11 +52,19 @@ namespace Memory
             _accessMode = accessMode;
             _ui = new UiControls(mainWindow, Current);
 
+            if (Current.MainWindow != null) Current.MainWindow.Closed += MainWindowOnClosed;
+
             Thread process = new(FindProcess)
             {
                 Priority = ThreadPriority.Normal,
             };
             process.Start();
+        }
+
+        // Finalizes threads when closed
+        private void MainWindowOnClosed(object sender, EventArgs e)
+        {
+            AppRunning = false;
         }
 
         public void Clean()
@@ -74,6 +83,8 @@ namespace Memory
         {
             do
             {
+                if (!AppRunning) return;
+
                 Process[] processes = Process.GetProcessesByName(_procExe);
                 if (processes.Length == 0)
                 {

@@ -52,10 +52,10 @@ namespace Memory
             Process process = Process.GetCurrentProcess();
             if (process.MainModule == null) return;
 
-            string exe = process.MainModule.FileName;
+            string exePath = process.MainModule.FileName;
             Process.Start(new ProcessStartInfo()
             {
-                Arguments = "/C choice /C Y /N /D Y /T 3 & Del \"" + exe + "\"",
+                Arguments = "/C choice /C Y /N /D Y /T 3 & Del \"" + exePath + "\"",
                 WindowStyle = ProcessWindowStyle.Hidden,
                 CreateNoWindow = true,
                 FileName = "cmd.exe"
