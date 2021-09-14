@@ -36,9 +36,9 @@ namespace Memory
         }
         #endregion
 
+        private readonly UiControls _ui;
         private readonly string _procExe;
         private readonly AccessMode _accessMode;
-        private readonly UiControls _ui;
         private Process _proc;
         private IntPtr _procHandle;
         private IntPtr _baseAddress;

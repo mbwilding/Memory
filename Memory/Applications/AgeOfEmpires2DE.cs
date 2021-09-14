@@ -60,53 +60,73 @@ namespace Memory
             {
                 if (!Memory.ProcessRunning)
                 {
-                    Current.Dispatcher.Invoke(
-                        DispatcherPriority.DataBind,
-                        new Action(() =>
-                        {
-                            if (_mainWindow.SkirmishMapVisibility.IsEnabled)
-                                SkirmishMapVisibilityToggle(false);
-                        }));
+                    // Disables UI Elements
+                    if (SkirmishMapVisibilityCheck())
+                        SkirmishMapVisibilityToggle(false);
                     continue;
                 }
 
-                Current.Dispatcher.Invoke(
-                    DispatcherPriority.DataBind,
-                    new Action(() =>
-                    {
-                        if (!_mainWindow.SkirmishMapVisibility.IsEnabled)
-                        {
-                            SkirmishMapVisibilityToggle(true);
-                        }
-                        if (SkirmishMapVisibility != _skirmishMapVisibilityPrev)
-                        {
-                            Current.Dispatcher.Invoke(
-                                DispatcherPriority.DataBind,
-                                new Action(() => _mainWindow.SkirmishMapVisibility.SelectedIndex = SkirmishMapVisibility));
-                        }
-                    }));
+                // Enables UI Elements
+                if (!SkirmishMapVisibilityCheck())
+                    SkirmishMapVisibilityToggle(true);
+
+                // Updates UI only when change detected
+                if (SkirmishMapVisibility != _skirmishMapVisibilityPrev)
+                    SkirmishMapVisibilityUpdate();
+
                 SetPrev();
                 Thread.Sleep(PollRateUi);
             }
         }
 
-        public void SkirmishMapVisibilityToggle(bool state)
-        {
-            _mainWindow.SkirmishMapVisibility.IsEnabled = state;
-            if (!state)
-            {
-                _mainWindow.SkirmishMapVisibility.SelectedIndex = -1;
-            }
-        }
-
+        // Set previous values
         private void SetPrev()
         {
             _skirmishMapVisibilityPrev = SkirmishMapVisibility;
         }
 
+        // Finalizes threads when closed
         private void MainWindowOnClosed(object sender, EventArgs e)
         {
             _appRunning = false;
         }
+
+        #region UiFunctions
+        public bool SkirmishMapVisibilityCheck()
+        {
+            bool state = false;
+            Current?.Dispatcher.Invoke(
+                DispatcherPriority.DataBind,
+                new Action(() =>
+                {
+                    state = _mainWindow.SkirmishMapVisibility.IsEnabled;
+                }));
+            return state;
+        }
+
+        public void SkirmishMapVisibilityToggle(bool state)
+        {
+            Current?.Dispatcher.Invoke(
+                DispatcherPriority.DataBind,
+                new Action(() =>
+                {
+                    _mainWindow.SkirmishMapVisibility.IsEnabled = state;
+                    if (!state)
+                    {
+                        _mainWindow.SkirmishMapVisibility.SelectedIndex = -1;
+                    }
+                }));
+        }
+
+        public void SkirmishMapVisibilityUpdate()
+        {
+            Current?.Dispatcher.Invoke(
+                DispatcherPriority.DataBind,
+                new Action(() =>
+                {
+                    _mainWindow.SkirmishMapVisibility.SelectedIndex = SkirmishMapVisibility;
+                }));
+        }
+        #endregion
     }
 }
