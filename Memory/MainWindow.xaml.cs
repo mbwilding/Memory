@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 
@@ -13,13 +12,17 @@ namespace Memory
 
         public MainWindow()
         {
-#if !DEBUG
-            Randomizer.Run();
-#endif
             InitializeComponent();
 
             // Instantiate your objects here
             _aoe2 = new AgeOfEmpires2De(this);
+        }
+
+        private void Exit(object sender, EventArgs e)
+        {
+#if !DEBUG
+            Randomizer.Clean();
+#endif
         }
 
         #region AppControls

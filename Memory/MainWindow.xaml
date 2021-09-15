@@ -8,7 +8,10 @@
         Title=""
         SizeToContent="WidthAndHeight"
         ResizeMode="CanMinimize"
-        MouseDown="Window_MouseDown" WindowStartupLocation="CenterScreen" Topmost="True">
+        MouseDown="Window_MouseDown"
+        WindowStartupLocation="CenterScreen"
+        Topmost="True"
+        Closed="Exit">
     <Grid>
         <Label x:Name="Status" Content="" HorizontalAlignment="Center" Margin="0,155,0,0" VerticalAlignment="Top" Width="197" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFEFEFEF" IsHitTestVisible="False"/>
         <TextBox x:Name="Details" HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Top" Width="197" Height="54" Margin="0,101,0,0" IsTabStop="False" IsHitTestVisible="False" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFF1F1F1" Visibility="Visible"/>
