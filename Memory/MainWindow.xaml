@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Memory"
         mc:Ignorable="d"
-        Title="{Binding Title}"
+        Title=""
         SizeToContent="WidthAndHeight"
         ResizeMode="CanMinimize"
         MouseDown="Window_MouseDown" WindowStartupLocation="CenterScreen" Topmost="True">

