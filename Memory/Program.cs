@@ -11,7 +11,6 @@ namespace Memory
 #if !DEBUG
             Randomizer.Run();
 #endif
-
             App a = new App();
             a.StartupUri = new Uri("/MainWindow.xaml", UriKind.Relative);
             a.Run();
