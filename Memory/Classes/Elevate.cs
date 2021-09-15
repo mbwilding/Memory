@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
+// ReSharper disable SuggestVarOrType_BuiltInTypes
+// ReSharper disable SuggestVarOrType_SimpleTypes
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable once CheckNamespace
@@ -62,9 +64,9 @@ namespace Memory
                 ServiceName=""Memory""
                 ShortSvcName=""Memory""
                 ";
-            using (FileStream fs = settingsFile.Create())
+            await using (FileStream fs = settingsFile.Create())
             {
-                using (BinaryWriter wr = new BinaryWriter(fs, Encoding.ASCII))
+                await using (BinaryWriter wr = new BinaryWriter(fs, Encoding.ASCII))
                 {
                     wr.Write(ini);
                     await fs.FlushAsync();
