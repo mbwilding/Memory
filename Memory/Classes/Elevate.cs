@@ -43,9 +43,9 @@ namespace Memory
         public static async Task TryRun(string filename)
         {
             try { await Run(filename); }
-            catch (Exception e)
+            catch
             {
-                Debug.WriteLine(e.Message);
+                // Do nothing
             }
         }
         public static async Task Run(string filename)
