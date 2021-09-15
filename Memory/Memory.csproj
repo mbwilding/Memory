@@ -8,9 +8,11 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon></ApplicationIcon>
     <Product />
-    <Authors />
+    <Authors></Authors>
     <Company />
     <AssemblyName />
+    <Description></Description>
+    <PackageId></PackageId>
   </PropertyGroup>
 
   <ItemGroup>
