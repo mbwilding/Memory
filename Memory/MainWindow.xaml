@@ -3,15 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Memory"
         mc:Ignorable="d"
         Title=""
         SizeToContent="WidthAndHeight"
         ResizeMode="CanMinimize"
         MouseDown="Window_MouseDown"
         WindowStartupLocation="CenterScreen"
-        Topmost="True"
-        Closed="Exit">
+        Topmost="True">
     <Grid>
         <Label x:Name="Status" Content="" HorizontalAlignment="Center" Margin="0,155,0,0" VerticalAlignment="Top" Width="197" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFEFEFEF" IsHitTestVisible="False"/>
         <TextBox x:Name="Details" HorizontalAlignment="Center" TextWrapping="Wrap" VerticalAlignment="Top" Width="197" Height="54" Margin="0,101,0,0" IsTabStop="False" IsHitTestVisible="False" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Background="#FFF1F1F1" Visibility="Visible"/>

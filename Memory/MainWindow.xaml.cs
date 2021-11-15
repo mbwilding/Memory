@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Windows;
 using System.Windows.Input;
 
@@ -18,13 +17,6 @@ namespace Memory
             _aoe2 = new AgeOfEmpires2De(this);
         }
 
-        private void Exit(object sender, EventArgs e)
-        {
-#if !DEBUG
-            Randomizer.Clean();
-#endif
-        }
-
         #region AppControls
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -34,16 +26,18 @@ namespace Memory
         #endregion
 
         #region UiControls
+
         private void SkirmishMapVisibility_DropDownClosed(object sender, EventArgs e)
         {
             _aoe2.SkirmishMapVisibility_DropDownClosed();
         }
-        #endregion
 
         private void SkirmishMapVisibilityFreeze_CheckedChanged(object sender, RoutedEventArgs e)
         {
             bool state = SkirmishMapVisibilityFreeze.IsChecked == true;
             _aoe2.SkirmishMapVisibilityFreezed = state;
         }
+
+        #endregion
     }
 }
