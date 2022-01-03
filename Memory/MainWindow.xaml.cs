@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
 
 namespace Memory
@@ -7,14 +6,14 @@ namespace Memory
     // ReSharper disable once RedundantExtendsListEntry
     public partial class MainWindow : Window
     {
-        private readonly AgeOfEmpires2De _aoe2;
+        private readonly AssaultCube ac;
 
         public MainWindow()
         {
             InitializeComponent();
 
             // Instantiate your objects here
-            _aoe2 = new AgeOfEmpires2De(this);
+            ac = new AssaultCube(this);
         }
 
         #region AppControls
@@ -27,15 +26,14 @@ namespace Memory
 
         #region UiControls
 
-        private void SkirmishMapVisibility_DropDownClosed(object sender, EventArgs e)
+        private void CurrentAmmoFreeze_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            _aoe2.SkirmishMapVisibility_DropDownClosed();
+            ac.AmmoMagFrozen = AmmoMagFrozen.IsChecked == true;
         }
 
-        private void SkirmishMapVisibilityFreeze_CheckedChanged(object sender, RoutedEventArgs e)
+        private void MaxAmmoFreeze_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            bool state = SkirmishMapVisibilityFreeze.IsChecked == true;
-            _aoe2.SkirmishMapVisibilityFreezed = state;
+            ac.AmmoBagFrozen = AmmoBagFrozen.IsChecked == true;
         }
 
         #endregion

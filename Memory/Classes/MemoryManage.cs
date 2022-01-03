@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using static System.Windows.Application;
 
 // ReSharper disable UnusedMember.Global
@@ -42,6 +42,7 @@ namespace Memory
         private Process _proc;
         private IntPtr _procHandle;
         private IntPtr _baseAddress;
+        private bool _is32Bit;
         public bool AppRunning = true;
 
         public bool ProcessRunning { get; private set; }
@@ -54,11 +55,7 @@ namespace Memory
 
             if (Current.MainWindow != null) Current.MainWindow.Closed += MainWindowOnClosed;
 
-            Thread process = new(FindProcess)
-            {
-                Priority = ThreadPriority.Normal,
-            };
-            process.Start();
+            Task.Run(FindProcess);
         }
 
         // Finalizes threads when closed
@@ -76,21 +73,21 @@ namespace Memory
         {
             ProcessRunning = false;
             _ui.Details(string.Empty);
-            FindProcess();
+            Task.Run(FindProcess);
         }
 
-        private void FindProcess()
+        private Task FindProcess()
         {
             do
             {
-                if (!AppRunning) return;
+                if (!AppRunning) return Task.CompletedTask;
 
                 Process[] processes = Process.GetProcessesByName(_procExe);
                 if (processes.Length == 0)
                 {
                     ProcessRunning = false;
                     _ui.Status("Please start the process.");
-                    Thread.Sleep(500);
+                    Task.Delay(500);
                     continue;
                 }
                 _proc = processes[0];
@@ -105,15 +102,17 @@ namespace Memory
 
             if (_proc.StartTime > DateTime.Now - TimeSpan.FromMilliseconds(1000))
             {
-                Thread.Sleep(100);
+                Task.Delay(100);
             }
 
-            if (_proc.MainModule == null) return;
+            if (_proc.MainModule == null) return Task.CompletedTask;
             _baseAddress = _proc.MainModule.BaseAddress;
             if (_baseAddress == IntPtr.Zero)
             {
                 _ui.Status("Program has access protection.");
             }
+
+            _is32Bit = Architecture.Check(_procHandle);
 
             _proc.EnableRaisingEvents = true;
             _proc.Exited += ProcessExit;
@@ -125,6 +124,8 @@ namespace Memory
                  + "\nBase Address: " + _baseAddress.ToString("X")
                  + "\nEntry Point:  " + _proc.MainModule.EntryPointAddress.ToString("X")
             );
+
+            return Task.CompletedTask;
         }
 
         private long TraverseOffsets(List<long> offsets)
@@ -136,111 +137,97 @@ namespace Memory
                 address += offsets[i];
                 if (i == offsets.Count - 1) break;
                 ReadProcessMemory(_procHandle, (IntPtr)address, buffer, buffer.Length, out _);
-                address = BitConverter.ToInt64(buffer, 0);
+                address = _is32Bit ? BitConverter.ToInt32(buffer, 0) : BitConverter.ToInt64(buffer, 0);
             }
             return address;
         }
 
         #region MemFuncs
-        public int ReadInt(List<long> offsets)
+
+        public T Read<T>(List<long> offsets) where T : IConvertible
         {
-            byte[] buffer = new byte[sizeof(int)];
-            long offset = TraverseOffsets(offsets);
-            ReadProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-            return BitConverter.ToInt32(buffer, 0);
+            return (T)ConvertData<T>(offsets);
         }
 
-        public uint ReadUInt(List<long> offsets)
+        public void Write<T>(List<long> offsets, T value) where T : IConvertible
         {
-            byte[] buffer = new byte[sizeof(uint)];
-            long offset = TraverseOffsets(offsets);
-            ReadProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-            return BitConverter.ToUInt32(buffer, 0);
-        }
+            byte[] buffer;
 
-        public long ReadInt64(List<long> offsets)
-        {
-            byte[] buffer = new byte[sizeof(long)];
-            long offset = TraverseOffsets(offsets);
-            ReadProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-            return BitConverter.ToInt64(buffer, 0);
-        }
-
-        public ulong ReadUInt64(List<long> offsets)
-        {
-            byte[] buffer = new byte[sizeof(ulong)];
-            long offset = TraverseOffsets(offsets);
-            ReadProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-            return BitConverter.ToUInt64(buffer, 0);
-        }
-
-        public void WriteInt(List<long> offsets, int value)
-        {
-            byte[] buffer = BitConverter.GetBytes(value);
-            long offset = TraverseOffsets(offsets);
-            WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-        }
-
-        public void WriteInt64(List<long> offsets, long value)
-        {
-            byte[] buffer = BitConverter.GetBytes(value);
-            long offset = TraverseOffsets(offsets);
-            WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-        }
-
-        public float ReadFloat(List<long> offsets)
-        {
-            byte[] buffer = new byte[sizeof(float)];
-            long offset = TraverseOffsets(offsets);
-            ReadProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-            return BitConverter.ToSingle(buffer, 0);
-        }
-
-        public void WriteFloat(List<long> offsets, float value)
-        {
-            byte[] buffer = BitConverter.GetBytes(value);
-            long offset = TraverseOffsets(offsets);
-            WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-        }
-
-        public double ReadDouble(List<long> offsets)
-        {
-            byte[] buffer = new byte[sizeof(double)];
-            long offset = TraverseOffsets(offsets);
-            ReadProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-            return BitConverter.ToDouble(buffer, 0);
-        }
-
-        public void WriteDouble(List<long> offsets, double value)
-        {
-            byte[] buffer = BitConverter.GetBytes(value);
-            long offset = TraverseOffsets(offsets);
-            WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-        }
-
-        public string ReadString(List<long> offsets)
-        {
-            string myString = string.Empty;
-
-            for (ulong i = 1; i < ulong.MaxValue; i++)
+            if (typeof(T) != typeof(string))
             {
-                byte[] buffer = new byte[i];
-                long offset = TraverseOffsets(offsets);
-                ReadProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
-                if (buffer[(i - 1)] == 0) return myString;
-                myString = Encoding.UTF8.GetString(buffer);
+                buffer = BitConverter.GetBytes((dynamic) value);
             }
-            return myString;
+            else
+            {
+                byte[] newString = Encoding.UTF8.GetBytes((dynamic) value);
+                buffer = new byte[Read<string>(offsets).Length];
+                Array.Copy(newString, buffer, buffer.Length);
+            }
+
+            TraverseWrite(offsets, buffer);
         }
 
-        public void WriteString(List<long> offsets, string value)
+        private byte[] TraverseRead(List<long> offsets, byte[] buffer)
         {
-            byte[] newString = Encoding.UTF8.GetBytes(value);
-            byte[] buffer = new byte[ReadString(offsets).Length];
-            Array.Copy(newString, buffer, buffer.Length);
+            long offset = TraverseOffsets(offsets);
+            ReadProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
+            return buffer;
+        }
+
+        private void TraverseWrite(List<long> offsets, byte[] buffer)
+        {
             long offset = TraverseOffsets(offsets);
             WriteProcessMemory(_procHandle, (IntPtr)offset, buffer, buffer.Length, out _);
         }
+
+        private object ConvertData<T>(List<long> offsets)
+        {
+            if (typeof(T) != typeof(string))
+            {
+                var value = TraverseRead(offsets, new byte[Marshal.SizeOf(typeof(T))]);
+
+                if (typeof(T) == typeof(byte) || typeof(T) == typeof(sbyte))
+                    return value[0];
+                if (typeof(T) == typeof(short))
+                    return BitConverter.ToInt16(value, 0);
+                if (typeof(T) == typeof(ushort))
+                    return BitConverter.ToUInt16(value, 0);
+                if (typeof(T) == typeof(int))
+                    return BitConverter.ToInt32(value, 0);
+                if (typeof(T) == typeof(uint))
+                    return BitConverter.ToUInt32(value, 0);
+                if (typeof(T) == typeof(long))
+                    return BitConverter.ToInt64(value, 0);
+                if (typeof(T) == typeof(ulong))
+                    return BitConverter.ToInt64(value, 0);
+                if (typeof(T) == typeof(float))
+                    return BitConverter.ToSingle(value, 0);
+                if (typeof(T) == typeof(double))
+                    return BitConverter.ToDouble(value, 0);
+                if (typeof(T) == typeof(bool))
+                    return BitConverter.ToBoolean(value, 0);
+                if (typeof(T) == typeof(char))
+                    return BitConverter.ToChar(value, 0);
+                if (typeof(T) == typeof(Half))
+                    return BitConverter.ToHalf(value, 0);
+            }
+            else
+            {
+                string myString = string.Empty;
+
+                for (ulong i = 1; i < ulong.MaxValue; i++)
+                {
+                    byte[] buffer = new byte[i];
+                    buffer = TraverseRead(offsets, buffer);
+                    if (buffer[i - 1] == 0) return myString;
+                    myString = Encoding.UTF8.GetString(buffer);
+                }
+                return myString;
+            }
+
+            return default;
+        }
+
         #endregion
     }
 }
