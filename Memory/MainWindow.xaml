@@ -13,12 +13,12 @@
     <StackPanel>
         <TextBox x:Name="Details" TextWrapping="Wrap" Width="197" Height="67" IsTabStop="False" IsHitTestVisible="False" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Background="#FFF1F1F1" Visibility="Visible" Padding="5"/>
         <DockPanel Margin="5, 0">
-            <CheckBox Name="AmmoMagFrozen" VerticalAlignment="Center" Unchecked="CurrentAmmoFreeze_CheckedChanged" Checked="CurrentAmmoFreeze_CheckedChanged"/>
+            <CheckBox Name="AmmoMagFrozen" VerticalAlignment="Center" Unchecked="AmmoMagFrozen_CheckedChanged" Checked="AmmoMagFrozen_CheckedChanged"/>
             <Label Content="Ammo - Mag" VerticalAlignment="Center"/>
             <TextBox Name="AmmoMag" Width="60" HorizontalAlignment="Right" HorizontalContentAlignment="Center" VerticalAlignment="Center"/>
         </DockPanel>
         <DockPanel Margin="5, 0">
-            <CheckBox Name="AmmoBagFrozen" VerticalAlignment="Center" Unchecked="CurrentAmmoFreeze_CheckedChanged" Checked="MaxAmmoFreeze_CheckedChanged"/>
+            <CheckBox Name="AmmoBagFrozen" VerticalAlignment="Center" Unchecked="AmmoMagFrozen_CheckedChanged" Checked="AmmoBagFrozen_CheckedChanged"/>
             <Label Content="Ammo - Bag" VerticalAlignment="Center"/>
             <TextBox Name="AmmoBag" Width="60" HorizontalAlignment="Right" HorizontalContentAlignment="Center" VerticalAlignment="Center"/>
         </DockPanel>

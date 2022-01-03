@@ -26,12 +26,12 @@ namespace Memory
 
         #region UiControls
 
-        private void CurrentAmmoFreeze_CheckedChanged(object sender, RoutedEventArgs e)
+        private void AmmoMagFrozen_CheckedChanged(object sender, RoutedEventArgs e)
         {
             ac.AmmoMagFrozen = AmmoMagFrozen.IsChecked == true;
         }
 
-        private void MaxAmmoFreeze_CheckedChanged(object sender, RoutedEventArgs e)
+        private void AmmoBagFrozen_CheckedChanged(object sender, RoutedEventArgs e)
         {
             ac.AmmoBagFrozen = AmmoBagFrozen.IsChecked == true;
         }
