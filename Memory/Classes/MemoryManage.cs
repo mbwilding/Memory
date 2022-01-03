@@ -14,6 +14,7 @@ namespace Memory
     public class MemoryManage
     {
         #region Native Imports
+
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr OpenProcess(int dwDesiredAccess, bool bInheritHandle, int dwProcessId);
 
@@ -25,6 +26,11 @@ namespace Memory
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, byte[] lpBuffer, int dwSize, out uint lpNumberOfBytesWritten);
+
+        [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool IsWow64Process([In] IntPtr hProcess, [Out] out bool is32Bit);
+
         #endregion
 
         #region Enums
@@ -112,7 +118,7 @@ namespace Memory
                 _ui.Status("Program has access protection.");
             }
 
-            _is32Bit = Architecture.Check(_procHandle);
+            _is32Bit = ArchitectureCheck(_procHandle);
 
             _proc.EnableRaisingEvents = true;
             _proc.Exited += ProcessExit;
@@ -126,6 +132,12 @@ namespace Memory
             );
 
             return Task.CompletedTask;
+        }
+
+        internal bool ArchitectureCheck(IntPtr handle)
+        {
+            IsWow64Process(handle, out bool is32Bit);
+            return is32Bit;
         }
 
         private long TraverseOffsets(List<long> offsets)
