@@ -136,7 +136,7 @@ namespace Memory
             return Task.CompletedTask;
         }
 
-        internal bool ArchitectureCheck(IntPtr handle)
+        private bool ArchitectureCheck(IntPtr handle)
         {
             IsWow64Process(handle, out bool is32Bit);
             return is32Bit;

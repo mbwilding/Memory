@@ -6,13 +6,13 @@
     <UseWPF>true</UseWPF>
     <StartupObject>Memory.Program</StartupObject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <ApplicationIcon></ApplicationIcon>
-    <Product />
-    <Authors></Authors>
-    <Company />
-    <AssemblyName />
-    <Description></Description>
-    <PackageId></PackageId>
+    <ApplicationIcon/>
+    <Product/>
+    <Authors>Matthew Wilding</Authors>
+    <Company>Wilding Studios</Company>
+    <AssemblyName/>
+    <Description/>
+    <PackageId/>
   </PropertyGroup>
 
 </Project>

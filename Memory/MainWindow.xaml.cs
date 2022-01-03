@@ -6,14 +6,14 @@ namespace Memory
     // ReSharper disable once RedundantExtendsListEntry
     public partial class MainWindow : Window
     {
-        private readonly AssaultCube ac;
+        private readonly AssaultCube _ac;
 
         public MainWindow()
         {
             InitializeComponent();
 
             // Instantiate your objects here
-            ac = new AssaultCube(this);
+            _ac = new AssaultCube(this);
         }
 
         #region AppControls
@@ -28,12 +28,12 @@ namespace Memory
 
         private void AmmoMagFrozen_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            ac.AmmoMagFrozen = AmmoMagFrozen.IsChecked == true;
+            _ac.AmmoMagFrozen = AmmoMagFrozen.IsChecked == true;
         }
 
         private void AmmoBagFrozen_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            ac.AmmoBagFrozen = AmmoBagFrozen.IsChecked == true;
+            _ac.AmmoBagFrozen = AmmoBagFrozen.IsChecked == true;
         }
 
         #endregion

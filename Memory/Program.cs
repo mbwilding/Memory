@@ -2,7 +2,7 @@
 
 namespace Memory
 {
-    internal class Program
+    internal static class Program
     {
         [STAThread]
         // ReSharper disable once UnusedParameter.Local
