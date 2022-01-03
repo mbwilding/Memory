@@ -34,12 +34,14 @@ namespace Memory
         #endregion
 
         #region Enums
+
         public enum AccessMode
         {
             Read = 0x0010,
             Write = 0x0020,
             All = 0x1F0FFF
         }
+
         #endregion
 
         private readonly UiControls _ui;
